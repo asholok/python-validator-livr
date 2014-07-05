@@ -25,22 +25,14 @@ class Validator(object):
         IS_DEFAULT_AUTO_TRIM = bool(is_auto_trim)
 
     def prepare(self):
-        all_rules = copy.deepcopy(self.__livr_rules)
+        if self.__is_prepare:
+            return
 
-        for field in livr_rule:
-            validators = []
-            rules_quantity = len(all_rules[field])
-            
-            for x in range(rules_quantity):
-                parsed = self._parse_rule(rules_quantity[x])
-                validators.addend(self._build_validator(parsed["name"], parsed["args"]))
-
-            self.__validators[field] = validators
-
-        self.__is_prepare = True 
-        #return self ???
+        for name, rules in self.__livr_rules.iteritems():
+            self.__validators[name] = [self.__build_validator(*(self.__parse_rule(rule))) for rule in rules]
+        self.__is_prepare = True
     
-    def valdate(self, data):
+    def validate(self, data):
         if not self.__is_prepare:
             self.prepare()
         if self.__is_auto_trim:
@@ -51,33 +43,23 @@ class Validator(object):
         errors  = {}
         result = {}
 
-        for field_name in self.__validators:
-            #isOk --- wtf?
-            validators = self.__validators[field_name]
-            rules_quantity = len(validators)
-
-            if rules_quantity == 0:
+        for field_name, validators in self.__validators:
+            if not len(validators):
                 continue
-            
-            value = data[field_name] # if data HASE NO such field_name
 
-            for x in range(rules_quantity):
-                field_result_arr = []
+            mid_result = []
+            value = data[field_name]
 
-                errorCode = validators[x](
-                    result[field_name] if field_name in result else value,
-                    data,
-                    field_result_arr
-                    )
+            for func in validators:
+                arg = result[field_name] if field_name in result else value
+                error_code = func(arg, data, mid_result)
 
-                if errorCode:
-                    errors[field_name] = errorCode
+                if error_code:
+                    errors[field_name] = error_code
                     break
-                if field_name in data:
-                    if len(field_result_arr):
-                        result[field_name] = field_result_arr[0]
-                    else:
-                        result[field_name] = value
+                else:
+                    result[field_name] = mid_result[0] if len(mid_result) else value
+
         if not len(errors):
             self.__errors = None
             return result
@@ -94,7 +76,6 @@ class Validator(object):
     def register_rules(self, rules):
         for rule_name, rule_value in rules.iteritems():
             self.__validator_bilders[rule_name] = rule_value
-        #return self Why?
 
     def __parse_rule(self,  livr_rule):
         if isinstance(livr_rule, dict):
