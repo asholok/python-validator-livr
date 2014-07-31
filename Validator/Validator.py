@@ -92,13 +92,13 @@ class Validator(object):
 
     def __build_validator(self, name, args):
         if not name in self.__validator_bilders:
-            raise AttributeError("Rule [{}] not registered".format(name))
+            raise Exception("Rule [{}] not registered".format(name))
         all_args = []
 
         all_args.extend(args)
         all_args.append(self.__validator_bilders)
 
-        return getattr(self.__validator_bilders, name)(*all_args)
+        return self.__validator_bilders[name](*all_args)
 
     def __auto_trim(self, data):
         if type(data) is str:
