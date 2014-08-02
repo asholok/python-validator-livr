@@ -27,13 +27,49 @@ class Filters(object):
 
 	@staticmethod
 	def trim():
-		return lambda val, unuse, output: 0 if val == None or val == '' else Filters.trim_value(val, output)
+		return lambda val, unuse, output: 0 if not val else Filters.trim_value(val, output)
 		
 	@staticmethod
 	def to_lc():
-		return lambda val, unuse, output: 0 if val == None or val == '' else Filters.make_lc(val, output)
+		return lambda val, unuse, output: 0 if not val else Filters.make_lc(val, output)
 
 	@staticmethod
 	def to_uc():
-		return lambda val, unuse, output: 0 if val == None or val == '' else Filters.make_uc(val, output)
-	
+		return lambda val, unuse, output: 0 if not val else Filters.make_uc(val, output)
+
+
+class Trim(object):
+	def __call__(self, val, unuse, output):
+		if not val:
+			return
+
+		if isinstance(value, dict):
+			output = {key: val.upper() for key, val in value.items()}
+		elif isinstance(val, list):
+			output = [val.upper() for val in value]
+		elif isinstance(val, str):
+			output = val.upper()
+
+class ToLc(object):
+	def __call__(self, val, unuse, output):
+		if not val:
+			return
+
+		if isinstance(value, dict):
+			output = {key: val.lower() for key, val in value.items()}
+		elif isinstance(val, list):
+			output = [val.lower() for val in value]
+		elif isinstance(val, str):
+			output = val.lower()
+
+class ToUc(object):
+	def __call__(self, val, unuse, output):
+		if not val:
+			return
+
+		if isinstance(value, dict):
+			output = {key: val.upper() for key, val in value.items()}
+		elif isinstance(val, list):
+			output = [val.upper() for val in value]
+		elif isinstance(val, str):
+			output = val.upper()
