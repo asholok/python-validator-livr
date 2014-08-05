@@ -60,7 +60,7 @@ class Validator(object):
                 else:
                     result[field_name] = mid_result[0] if len(mid_result) else value
 
-        if not len(errors):
+        if not errors:
             self.__errors = None
             return result
         else:

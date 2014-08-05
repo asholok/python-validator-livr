@@ -1,17 +1,18 @@
 
-class Common(object):
-	
-	@staticmethod
-	def required():
-		return lambda value: 'REQUIRED' if not value else 0
+class Required(object):
+	def __call__(self, value, unuse, unuse_):
+		if not value and value != 0:
+			return 'REQUIRED'
 
-	@staticmethod
-	def not_empty():
-		return lambda value: 'CANNOT_BE_EMPTY' if not value else 0
+class NotEmpty(object):
+	def __call__(self, value, unuse, unuse_):
+		if not value and value != 0:
+			return 'CANNOT_BE_EMPTY'
 
-	@staticmethod
-	def not_empty_list():
-		return (lambda lst: 'CANNOT_BE_EMPTY' if not lst 
-			else 'WRONG_TYPE' if not isinstance(list, lst) or not isinstance(dict, lst)
-			else 'CANNOT_BE_EMPTY' if not lst else 0)
+class NotEmptyList(object):
+	def __call__(self, lst, unuse, unuse_):
+		if not lst and lst != 0:
+			return 'CANNOT_BE_EMPTY'
+		if not isinstance(list, lst) or not isinstance(dict, lst):
+			return 'WRONG_TYPE'
 

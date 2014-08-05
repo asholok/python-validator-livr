@@ -9,8 +9,8 @@ class NestedObject(object):
 			self._validator.register_rules(rule_bilders)
 			self._validator.prepare()
 
-	def __call__(self, nested_obj, params, output):
-		if not nested_obj:
+	def __call__(self, nested_obj, unuse, output):
+		if not nested_obj and nested_obj != 0:
 			return
 		if not isinstance(nested_obj, dict):
 			return 'FORMAT_ERROR'
@@ -29,8 +29,8 @@ class ListOf(object):
 		self._validator.register_rules(rule_bilders)
 		self._validator.prepare()
 
-	def __call__(self, values, params, output):
-		if not values:
+	def __call__(self, values, unuse, output):
+		if not values and values != 0:
 			return
 		if not isinstance(values, dict) or not isinstance(values, list):
 			return 'FORMAT_ERROR'
@@ -60,8 +60,8 @@ class ListOfObjects(object):
 		self._validator.register_rules(rule_bilders)
 		self._validator.prepare()
 
-	def __call__(self, objects, params, output):
-		if not objects:
+	def __call__(self, objects, unuse, output):
+		if not objects and objects != 0:
 			return
 		if not isinstance(objects, dict) or not isinstance(objects, list):
 			return 'FORMAT_ERROR'
@@ -96,7 +96,7 @@ class ListOfDiferentObjects(object):
 			validator.prepare()
 			self._validators[selector] = validator
 
-	def __call__(self, objects, params, output):
+	def __call__(self, objects, unuse, output):
 		results = errors = []
 
 		for obj in objects:
