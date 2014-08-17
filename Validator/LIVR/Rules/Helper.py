@@ -1,6 +1,8 @@
 import sys
-sys.path.insert(0,'/home/asholok/St/Projects/Python-validator-livr/Validator')
-from Validator import Validator
+import os
+ROOT_PATH = '/'.join(str(os.path.abspath(__file__)).split('/')[:-3])
+sys.path.insert(0,ROOT_PATH)
+#from Validator import Validator
 
 class NestedObject(object):
 	def __init__(self, livr, rule_bilders):
@@ -85,14 +87,14 @@ class ListOfObjects(object):
 		output = results
 
 class ListOfDiferentObjects(object):
-	def __init__(self, selector_fields, livrs, rule_bilders):
+	def __init__(self, selector_fields, livrs, rule_builders):
 		self._validators = {}
 		self._selector_fields = selector_fields
 
-		for selector, livr in livrs:
+		for selector, livr in livrs.iteritems():
 			validator = Validator(livr)
 			
-			validator.register_rules(rule_bilders)
+			validator.register_rules(rule_builders)
 			validator.prepare()
 			self._validators[selector] = validator
 
@@ -116,3 +118,4 @@ class ListOfDiferentObjects(object):
 			return errors
 
 		output = results
+

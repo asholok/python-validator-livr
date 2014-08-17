@@ -1,13 +1,13 @@
 import re
 
-class Numeric(object):
+class Integer(object):
 	def __call__(self, value, unuse, unuse_):
 		if not value and value != 0:
 			return
 		if not isinstance(value, int) or not re.match("^-?[0-9]+$", str(value)):
 			return 'NOT_INTEGER'
 
-class PositiveIneger(object):
+class PositiveInteger(object):
 	def __call__(self, value, unuse, unuse_):
 		if not value and value != 0:
 			return
@@ -50,16 +50,16 @@ class MinNumber(object):
 		if number < self._min_number:
 			return 'TOO_LOW'
 
-class BetweenNumber(object):
-	def __init__(self, max_number, min_number):
-		self._max_number = max_number
-		self._min_number = min_number
+class BetweenNumbers(object):
+	def __init__(self, min_number, max_number):
+		self._max_number = str(max_number)
+		self._min_number = str(min_number)
 
 	def __call__(self, number, unuse, unuse_):
 		if not number and number != 0:
 			return
 
-		if number > self._max_number:
+		if str(number) > self._max_number:
 			return 'TOO_HIGH'
-		if number < self._min_number:
+		if str(number) < self._min_number:
 			return 'TOO_LOW'

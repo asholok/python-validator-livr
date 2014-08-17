@@ -1,5 +1,5 @@
 import copy
-DEFAULT_RULES = {};
+from LIVR import DEFAULT_RULES
 IS_DEFAULT_AUTO_TRIM = False;
 
 class Validator(object):
@@ -7,7 +7,7 @@ class Validator(object):
         self.__is_prepare = False
         self.__livr_rules = livr_rules
         self.__validators = {}
-        self.__validator_bilders = {}
+        self.__validator_builders = {}
         self.__errors = None
 
         if is_auto_trim == None:
@@ -20,16 +20,35 @@ class Validator(object):
     def register_defaulr_rules(rules):
         DEFAULT_RULES = copy.deepcopy(rules)
 
+        if VALIDATOR_LIST:
+            for validator in VALIDATOR_LIST:
+                validator.register_rules(rules)
+
     @staticmethod
     def set_default_auto_trim(is_auto_trim):
         IS_DEFAULT_AUTO_TRIM = bool(is_auto_trim)
+
+    def __make_validators(self, rules):
+        validators = []
+
+        for rule in rules:
+            if isinstance(rules, dict):
+                validators.append(self.__build_validator(**self.__parse_rule({rule:rules[rule]})))
+            else:
+                validators.append(self.__build_validator(**self.__parse_rule(rule)))
+        
+        return validators
 
     def prepare(self):
         if self.__is_prepare:
             return
 
         for name, rules in self.__livr_rules.iteritems():
-            self.__validators[name] = [self.__build_validator(*(self.__parse_rule(rule))) for rule in rules]
+            if not isinstance(rules, dict) and not isinstance(rules, list):
+                rules = list(rules)
+            
+            self.__validators[name] = self.__make_validators(rules)
+        
         self.__is_prepare = True
     
     def validate(self, data):
@@ -43,13 +62,17 @@ class Validator(object):
         errors  = {}
         result = {}
 
-        for field_name, validators in self.__validators:
-            if not len(validators):
+
+
+        for field_name, validators in self.__validators.iteritems():
+            if not validators:
                 continue
 
             mid_result = []
             value = data[field_name]
-
+            
+            print value
+            
             for func in validators:
                 arg = result[field_name] if field_name in result else value
                 error_code = func(arg, data, mid_result)
@@ -71,11 +94,11 @@ class Validator(object):
         return self.__errors
 
     def get_rules(self):
-        return self.__validator_bilders
+        return self.__validator_builders
 
     def register_rules(self, rules):
         for rule_name, rule_value in rules.iteritems():
-            self.__validator_bilders[rule_name] = rule_value
+            self.__validator_builders[rule_name] = rule_value
 
     def __parse_rule(self,  livr_rule):
         if isinstance(livr_rule, dict):
@@ -91,14 +114,14 @@ class Validator(object):
         return {"name": name, "args": content}
 
     def __build_validator(self, name, args):
-        if not name in self.__validator_bilders:
+        if not name in self.__validator_builders:
             raise Exception("Rule [{}] not registered".format(name))
-        all_args = []
+        # all_args = []
+        # print args
+        # all_args.extend(args)
+        # all_args.append(self.__validator_builders)
 
-        all_args.extend(args)
-        all_args.append(self.__validator_bilders)
-
-        return self.__validator_bilders[name](*all_args)
+        return self.__validator_builders[name](*args)
 
     def __auto_trim(self, data):
         if type(data) is str:
@@ -119,4 +142,5 @@ class Validator(object):
             return trimmed_dict
 
         return data
+
 
