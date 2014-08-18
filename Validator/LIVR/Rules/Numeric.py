@@ -1,65 +1,77 @@
 import re
 
 class Integer(object):
-	def __call__(self, value, unuse, unuse_):
-		if not value and value != 0:
-			return
-		if not isinstance(value, int) or not re.match("^-?[0-9]+$", str(value)):
-			return 'NOT_INTEGER'
+    def __init__(self, *args):
+        pass
+
+    def __call__(self, value, unuse, unuse_):
+        if not value:
+            return
+        if not re.match("^-?[0-9]+$", str(value)):
+            return 'NOT_INTEGER'
 
 class PositiveInteger(object):
-	def __call__(self, value, unuse, unuse_):
-		if not value and value != 0:
-			return
-		if not isinstance(value, int) or not re.match("^[1-9]+$", str(value)):
-			return 'NOT_INTEGER'
+    def __init__(self, *args):
+        pass
+
+    def __call__(self, value, unuse, unuse_):
+        if not value:
+            return
+        if not re.match("^[1-9][0-9]*$", str(value)):
+            return 'NOT_POSITIVE_INTEGER'
 
 class Decimal(object):
-	def __call__(self, value, unuse, unuse_):
-		if not value and value != 0:
-			return
-		if not isinstance(value, float) or not re.match("^(?:-?([0-9]+\.[0-9]+)|(?:[0-9]+))+$", str(value)):
-			return 'NOT_DECIMAL'
+    def __init__(self, *args):
+        pass
+
+    def __call__(self, value, unuse, unuse_):
+        if not value:
+            return
+        if not re.match("^(?:-?([0-9]+\.[0-9]+)|(?:[0-9]+))+$", str(value)):
+            return 'NOT_DECIMAL'
 
 class PositiveDecimal(object):
-	def __call__(self, value, unuse, unuse_):
-		if not value and value != 0:
-			return
-		if not isinstance(value, int) or not re.match("^(?:([0-9]+\.[0-9]+)|(?:[0-9]+))+$", str(value)):
-			return 'NOT_POSITIVE_DECIMAL'
+    def __init__(self, *args):
+        pass
+
+    def __call__(self, value, unuse, unuse_):
+        if not value:
+            return
+        if not re.match("^(?:([0-9]+\.[0-9]+)|(?:[0-9]+))+$", str(value)):
+            return 'NOT_POSITIVE_DECIMAL'
 
 class MaxNumber(object):
-	def __init__(self, max_number):
-		self._max_number = max_number
+    def __init__(self, *args):
+        self._max_number = args[1]
 
-	def __call__(self, number, unuse, unuse_):
-		if not number and number != 0:
-			return
+    def __call__(self, number, unuse, unuse_):
+        if not number:
+            return
 
-		if number > self._max_number:
-			return 'TOO_HIGH'
+        if number > self._max_number:
+            return 'TOO_HIGH'
 
 class MinNumber(object):
-	def __init__(self, min_number):
-		self._min_number = min_number
+    def __init__(self, *args):
+        self._min_number = args[1]
 
-	def __call__(self, number, unuse, unuse_):
-		if not number and number != 0:
-			return
+    def __call__(self, number, unuse, unuse_):
+        if not number:
+            return
 
-		if number < self._min_number:
-			return 'TOO_LOW'
+        if number < self._min_number:
+            return 'TOO_LOW'
 
 class BetweenNumbers(object):
-	def __init__(self, min_number, max_number):
-		self._max_number = str(max_number)
-		self._min_number = str(min_number)
+    def __init__(self, *args):
+        self._min_number = args[1]
+        self._max_number = args[2]
 
-	def __call__(self, number, unuse, unuse_):
-		if not number and number != 0:
-			return
+    def __call__(self, number, unuse, unuse_):
+        if not number:
+            return
 
-		if str(number) > self._max_number:
-			return 'TOO_HIGH'
-		if str(number) < self._min_number:
-			return 'TOO_LOW'
+        if number > self._max_number:
+            return 'TOO_HIGH'
+        if number < self._min_number:
+            return 'TOO_LOW'

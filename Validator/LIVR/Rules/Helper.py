@@ -2,120 +2,142 @@ import sys
 import os
 ROOT_PATH = '/'.join(str(os.path.abspath(__file__)).split('/')[:-3])
 sys.path.insert(0,ROOT_PATH)
-#from Validator import Validator
+
+import Validator
 
 class NestedObject(object):
-	def __init__(self, livr, rule_bilders):
-			self._validator = Validator(livr)
+    def __init__(self, *args):
+            self._livr = args[1]
+            self._rule_builders = args[0]
+            self._validator = Validator.Validator(self._livr)
 
-			self._validator.register_rules(rule_bilders)
-			self._validator.prepare()
+            self._validator.register_rules(self._rule_builders)
+            self._validator.prepare()
 
-	def __call__(self, nested_obj, unuse, output):
-		if not nested_obj and nested_obj != 0:
-			return
-		if not isinstance(nested_obj, dict):
-			return 'FORMAT_ERROR'
+    def __call__(self, nested_obj, unuse, output):
+        if not nested_obj or nested_obj == 0:
+            return
+        if not isinstance(nested_obj, dict):
+            return 'FORMAT_ERROR'
 
-		result = self._validator.validate(nested_obj)
+        result = self._validator.validate(nested_obj)
 
-		if not result:	
-			return self._validator.get_errors()
+        if not result:  
+            return self._validator.get_errors()
 
-		output = result 
+        output = result 
 
 class ListOf(object):
-	def __init__(self, livr, rule_bilders):
-		self._validator = Validator({'field':livr})
+    def __init__(self, *args):
+        self._livr = args[1]
+        self._rule_builders = args[0]
+        self._validator = Validator.Validator({'field':self._livr})
 
-		self._validator.register_rules(rule_bilders)
-		self._validator.prepare()
+        self._validator.register_rules(self._rule_builders)
+        self._validator.prepare()
 
-	def __call__(self, values, unuse, output):
-		if not values and values != 0:
-			return
-		if not isinstance(values, dict) or not isinstance(values, list):
-			return 'FORMAT_ERROR'
+    def __call__(self, values, unuse, output):
+        if not values or values == 0:
+            return
+        if not isinstance(values, dict) or not isinstance(values, list):
+            return 'FORMAT_ERROR'
 
-		return self._check_validation(values, output)
+        return self._check_validation(values, output)
 
-	def _check_validation(self, values, output):
-		results = errors = []
+    def _check_validation(self, values, output):
+        results = []
+        errors = []
 
-		for val in values:
-			result = self._validator.validate({'field': val})
+        for val in values:
+            result = self._validator.validate({'field': val})
 
-			if result:
-				results.append(result['field'])
-			else:
-				errors = self._validator.get_errors()['field']
+            if result:
+                results.append(result['field'])
+            else:
+                errors = self._validator.get_errors()['field']
 
-		if errors:
-			return errors
+        if errors:
+            return errors
 
-		output = results
+        output = results
 
 class ListOfObjects(object):
-	def __init__(self, livr, rule_bilders):
-		self._validator = Validator({'field':livr})
+    def __init__(self, *args):
+        self._livr = args[1]
+        self._rule_builders = args[0]
+        self._validator = Validator.Validator(self._livr)
 
-		self._validator.register_rules(rule_bilders)
-		self._validator.prepare()
+        self._validator.register_rules(self._rule_builders)
+        self._validator.prepare()
 
-	def __call__(self, objects, unuse, output):
-		if not objects and objects != 0:
-			return
-		if not isinstance(objects, dict) or not isinstance(objects, list):
-			return 'FORMAT_ERROR'
+    def __call__(self, objects, unuse, output):
+        if not objects or objects == 0:
+            return
+        if not isinstance(objects, dict) or not isinstance(objects, list):
+            return 'FORMAT_ERROR'
 
-		return self._check_validation(objects, output)
+        return self._check_validation(objects, output)
 
-	def _check_validation(self, objects, output):
-		results = errors = []
+    def _check_validation(self, objects, output):
+        results = []
+        errors = []
 
-		for obj in objects:
-			result = self._validator.validate(obj)
-			
-			if result:
-				results.append(result['field'])
-			else:
-				errors = self._validator.get_errors()['field']
+        for obj in objects:
+            result = self._validator.validate(obj)
+            
+            if result:
+                results.append(result['field'])
+            else:
+                errors = self._validator.get_errors()['field']
 
-		if errors:
-			return errors
+        if errors:
+            return errors
 
-		output = results
+        output = results
 
 class ListOfDiferentObjects(object):
-	def __init__(self, selector_fields, livrs, rule_builders):
-		self._validators = {}
-		self._selector_fields = selector_fields
+    def __init__(self, *args):
+        self._selector_fields = args[1]
+        self._livrs = args[2]
+        self._rule_builders = args[0]
+        self._validators = {}
 
-		for selector, livr in livrs.iteritems():
-			validator = Validator(livr)
-			
-			validator.register_rules(rule_builders)
-			validator.prepare()
-			self._validators[selector] = validator
 
-	def __call__(self, objects, unuse, output):
-		results = errors = []
+        for selector, livr in self._livrs.iteritems():
+            validator = Validator.Validator(livr)
+            
+            validator.register_rules(self._rule_builders)
+            validator.prepare()
+            self._validators[selector] = validator
 
-		for obj in objects:
-			if not isinstance(objects, list) or not self._validators[obj] or not self._validators[obj[self._selector_fields]]:
-				errors.append("FORMAT_ERROR")
-				continue
+    def __call__(self, objects, unuse, output):
+        results = []
+        errors = []
 
-			validator = self._validators[obj[self._selector_fields]]
-			result = validator.validate(obj)
+        if not objects or objects == 0:
+            return
+        if not isinstance(objects, list):
+            return 'FORMAT_ERROR'
 
-			if result:
-				results.append(result['field'])
-			else:
-				errors = self._validator.get_errors()['field']
+        for obj in objects:
+            if not isinstance(obj, dict) or not self._selector_fields in obj:
+                errors.append("FORMAT_ERROR")
+                continue
+            if not obj[self._selector_fields] in self._validators:
+                errors.append("FORMAT_ERROR")
+                continue
 
-		if errors:
-			return errors
+            validator = self._validators[obj[self._selector_fields]]
+            result = validator.validate(obj)
 
-		output = results
+            if result:
+                results.append(result)
+            else:
+                errors.append(validator.get_errors())
+        
+        if errors:
+            return errors
+
+        output.append(results)
+
 
