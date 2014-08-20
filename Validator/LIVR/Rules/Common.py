@@ -4,7 +4,7 @@ class Required(object):
         pass
 
     def __call__(self, value, unuse, unuse_):
-        if not value or value == 0:
+        if value == None or value == '':
             return 'REQUIRED'
 
 class NotEmpty(object):
@@ -12,7 +12,7 @@ class NotEmpty(object):
         pass
 
     def __call__(self, value, unuse, unuse_):
-        if not value or value == 0:
+        if value == '':
             return 'CANNOT_BE_EMPTY'
 
 class NotEmptyList(object):
@@ -20,8 +20,9 @@ class NotEmptyList(object):
         pass
         
     def __call__(self, lst, unuse, unuse_):
-        if not lst or lst == 0:
+        if lst == None or lst == '':
             return 'CANNOT_BE_EMPTY'
-        if not isinstance(list, lst) or not isinstance(dict, lst):
-            return 'WRONG_TYPE'
-
+        if not isinstance(lst, list):
+            return 'WRONG_FORMAT'
+        if not lst:
+            return 'CANNOT_BE_EMPTY'

@@ -3,8 +3,8 @@ class OneOf(object):
     def __init__(self, *args):
         self._allowed_list = args[1]
         
-        if not isinstance(self._allowed_list, list):
-            raise Exception('Wrong standard value! List Required')
+        # if not isinstance(self._allowed_list, list):
+        #     raise Exception('Wrong standard value! List Required')
     
     def __call__(self, value, unuse, unuse_):
         if not value:
@@ -15,8 +15,8 @@ class OneOf(object):
 class MaxLength(object):
     def __init__(self, *args):
         self._max_length = args[1]
-        if self._max_length < 1:
-            raise Exception('Wrong standard value! Only positive value')
+        # if self._max_length < 1:
+        #     raise Exception('Wrong standard value! Only positive value')
 
     def __call__(self, value, unuse, unuse_):
         if not value:
@@ -50,8 +50,8 @@ class BetweenLength(object):
     def __init__(self, *args):
         self._min_length = args[1]
         self._max_length = args[2]
-        if self._max_length < 1:
-            raise Exception('Wrong standard value! Only positive value')
+        # if self._max_length < 1:
+        #     raise Exception('Wrong standard value! Only positive value')
 
     def __call__(self, value, unuse, unuse_):
         if not value:

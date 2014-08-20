@@ -36,12 +36,11 @@ class ListOf(object):
         self._validator.register_rules(self._rule_builders)
         self._validator.prepare()
 
-    def __call__(self, values, unuse, output):
+    def __call__(self, values, unuse, output):   
         if not values or values == 0:
             return
-        if not isinstance(values, dict) or not isinstance(values, list):
+        if not isinstance(values, dict) and not isinstance(values, list):
             return 'FORMAT_ERROR'
-
         return self._check_validation(values, output)
 
     def _check_validation(self, values, output):
@@ -50,11 +49,11 @@ class ListOf(object):
 
         for val in values:
             result = self._validator.validate({'field': val})
-
             if result:
                 results.append(result['field'])
+                errors.append(None)
             else:
-                errors = self._validator.get_errors()['field']
+                errors.append(self._validator.get_errors()['field'])
 
         if errors:
             return errors
@@ -71,9 +70,9 @@ class ListOfObjects(object):
         self._validator.prepare()
 
     def __call__(self, objects, unuse, output):
-        if not objects or objects == 0:
+        if objects == None or objects == '':
             return
-        if not isinstance(objects, dict) or not isinstance(objects, list):
+        if not isinstance(objects, dict) and not isinstance(objects, list):
             return 'FORMAT_ERROR'
 
         return self._check_validation(objects, output)
@@ -83,12 +82,19 @@ class ListOfObjects(object):
         errors = []
 
         for obj in objects:
+            if not isinstance(obj, dict):
+                errors.append('FORMAT_ERROR')
+                continue
+
             result = self._validator.validate(obj)
             
             if result:
-                results.append(result['field'])
+                #print 'result {}'.format(result)
+                results.append(result)
+                errors.append(None)
             else:
-                errors = self._validator.get_errors()['field']
+                #print 'error {}'.format(self._validator.get_errors())
+                errors.append(self._validator.get_errors())
 
         if errors:
             return errors
@@ -120,7 +126,7 @@ class ListOfDiferentObjects(object):
             return 'FORMAT_ERROR'
 
         for obj in objects:
-            if not isinstance(obj, dict) or not self._selector_fields in obj:
+            if not isinstance(obj, dict) and not self._selector_fields in obj:
                 errors.append("FORMAT_ERROR")
                 continue
             if not obj[self._selector_fields] in self._validators:

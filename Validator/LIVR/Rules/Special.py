@@ -8,7 +8,7 @@ class Email(object):
     def __call__(self, email, unuse, unuse_):
         if not email or email == 0:
             return
-        if not re.match(_reg_exp_mail, email):
+        if not re.match(self._reg_exp_mail, email):
             return 'WRONG_EMAIL'
 
 class EqualToField(object):

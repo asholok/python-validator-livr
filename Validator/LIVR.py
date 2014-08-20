@@ -3,44 +3,50 @@ import sys
 PATH_TO_RULES = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/LIVR/Rules'
 sys.path.insert(0,PATH_TO_RULES)
 
-from Common import *
-from Filters import *
-from Helper import *
-from Special import *
-from String import *
-from Numeric import *
+# from Common import *
+# from Filters import *
+# from Helper import *
+# from Special import *
+# from String import *
+# from Numeric import *
 
+import Common
+import Filters
+import Helper
+import Special
+import String
+import Numeric
 
 DEFAULT_RULES = {
-    'required':         Required,
-    'not_empty':        NotEmpty,
-    'not_empty_list':   NotEmptyList,
+    'required':         Common.Required,
+    'not_empty':        Common.NotEmpty,
+    'not_empty_list':   Common.NotEmptyList,
 
-    'one_of':           OneOf,
-    'max_length':       MaxLength,
-    'min_length':       MinLength,
-    'length_equal':     EqualLength,
-    'length_between':   BetweenLength,
-    'like':             Like,
+    'one_of':           String.OneOf,
+    'max_length':       String.MaxLength,
+    'min_length':       String.MinLength,
+    'length_equal':     String.EqualLength,
+    'length_between':   String.BetweenLength,
+    'like':             String.Like,
 
-    'integer':          Integer,
-    'positive_integer': PositiveInteger,
-    'decimal':          Decimal,
-    'positive_decimal': PositiveDecimal,
-    'max_number':       MaxNumber,
-    'min_number':       MinNumber,
-    'number_between':   BetweenNumbers,
+    'integer':          Numeric.Integer,
+    'positive_integer': Numeric.PositiveInteger,
+    'decimal':          Numeric.Decimal,
+    'positive_decimal': Numeric.PositiveDecimal,
+    'max_number':       Numeric.MaxNumber,
+    'min_number':       Numeric.MinNumber,
+    'number_between':   Numeric.BetweenNumbers,
 
-    'email':            Email,
-    'equal_to_field':   EqualToField,
+    'email':            Special.Email,
+    'equal_to_field':   Special.EqualToField,
 
-    'nested_object':    NestedObject,
-    'list_of':          ListOf,
-    'list_of_objects':  ListOfObjects,
-    'list_of_different_objects': ListOfDiferentObjects,
+    'nested_object':    Helper.NestedObject,
+    'list_of':          Helper.ListOf,
+    'list_of_objects':  Helper.ListOfObjects,
+    'list_of_different_objects': Helper.ListOfDiferentObjects,
 
-    'trim':             Trim,
-    'to_lc':            ToLc,
-    'to_uc':            ToUc
+    'trim':             Filters.Trim,
+    'to_lc':            Filters.ToLc,
+    'to_uc':            Filters.ToUc
 }
 print PATH_TO_RULES

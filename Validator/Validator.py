@@ -74,8 +74,9 @@ class Validator(object):
                     errors[field_name] = error_code
                     break
                 elif value:
+                    #errors[field_name] = None
                     result[field_name] = mid_result[0] if len(mid_result) else value
-        
+
         if not errors:
             self.__errors = None
             return result
