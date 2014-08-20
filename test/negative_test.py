@@ -5,7 +5,6 @@ PATH_TO_NEGATIVE_TESTS = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1]
 PATH_TO_VALIDATOR = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])+'/Validator'
 sys.path.insert(0,PATH_TO_VALIDATOR)
 import Validator
-from collections import OrderedDict
 
 class NegativeTests(object):
 	def __init__(self):
@@ -49,5 +48,3 @@ c = NegativeTests()
 c.run()
 
 
-print PATH_TO_NEGATIVE_TESTS
-print PATH_TO_VALIDATOR
