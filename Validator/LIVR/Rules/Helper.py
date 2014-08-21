@@ -25,7 +25,7 @@ class NestedObject(object):
         if not result:  
             return self._validator.get_errors()
 
-        output = result 
+        output.append(result) 
 
 class ListOf(object):
     def __init__(self, *args):
@@ -49,16 +49,18 @@ class ListOf(object):
 
         for val in values:
             result = self._validator.validate({'field': val})
+            
             if result:
                 results.append(result['field'])
-                errors.append(None)
+                #errors.append(None)
             else:
                 errors.append(self._validator.get_errors()['field'])
+
 
         if errors:
             return errors
 
-        output = results
+        output.append(results)
 
 class ListOfObjects(object):
     def __init__(self, *args):
@@ -91,7 +93,7 @@ class ListOfObjects(object):
             if result:
                 #print 'result {}'.format(result)
                 results.append(result)
-                errors.append(None)
+                #errors.append(None)
             else:
                 #print 'error {}'.format(self._validator.get_errors())
                 errors.append(self._validator.get_errors())
@@ -99,7 +101,7 @@ class ListOfObjects(object):
         if errors:
             return errors
 
-        output = results
+        output.append(results)
 
 class ListOfDiferentObjects(object):
     def __init__(self, *args):

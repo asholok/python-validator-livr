@@ -68,14 +68,19 @@ class Validator(object):
             
             for func in validators:
                 arg = result[field_name] if field_name in result else value
+###                
+                #print 'arg {}'.format(arg)
+###
                 error_code = func(arg, data, mid_result)
 
                 if error_code:
                     errors[field_name] = error_code
                     break
-                elif value:
-                    #errors[field_name] = None
+                elif value != None:
                     result[field_name] = mid_result[0] if len(mid_result) else value
+###
+                    #print 'result[field_name] {}'.format(result[field_name])
+###
 
         if not errors:
             self.__errors = None

@@ -27,7 +27,7 @@ class Decimal(object):
     def __call__(self, value, unuse, unuse_):
         if value == None or value == '':
             return
-        if not re.match("^(?:-?([0-9]+\.[0-9])|(?:[0-9][0-9]+))+$", str(value)):
+        if not re.match("^(?:\-?(?:[0-9]+\.[0-9]+)|(?:[0-9]+))$", str(value)):
             return 'NOT_DECIMAL'
 
 class PositiveDecimal(object):
@@ -37,7 +37,7 @@ class PositiveDecimal(object):
     def __call__(self, value, unuse, unuse_):
         if value == None or value == '':
             return
-        if not re.match("^(?:([1-9]+\.[0-9])|(?:[1-9][0-9]+))+$", str(value)):
+        if not re.match("^(?:(?:[1-9][0-9]*\.[0-9]+)|(?:[1-9][0-9]*))$", str(value)):
             return 'NOT_POSITIVE_DECIMAL'
 
 class MaxNumber(object):

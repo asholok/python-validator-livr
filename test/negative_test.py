@@ -1,6 +1,6 @@
 import os
 import sys
-import json
+import yaml
 PATH_TO_NEGATIVE_TESTS = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/test_suite/negative'
 PATH_TO_VALIDATOR = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])+'/Validator'
 sys.path.insert(0,PATH_TO_VALIDATOR)
@@ -23,7 +23,7 @@ class NegativeTests(object):
 		for path in files_path:
 			name_in_dict = ''.join(path.split('/')[-1]).replace('.json', '')
 			with open(path) as f:
-				data[name_in_dict] = json.load(f)
+				data[name_in_dict] = yaml.load(f)
 		
 		return data
 

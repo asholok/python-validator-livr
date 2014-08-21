@@ -1,3 +1,4 @@
+import re
 
 class OneOf(object):
     def __init__(self, *args):
@@ -14,14 +15,14 @@ class OneOf(object):
 
 class MaxLength(object):
     def __init__(self, *args):
-        self._max_length = args[1]
+        self._max_length = int(args[1])
         # if self._max_length < 1:
         #     raise Exception('Wrong standard value! Only positive value')
 
     def __call__(self, value, unuse, unuse_):
         if not value:
             return
-        if len(str(value)) > self._max_length:
+        if len(value) > self._max_length:
             return 'TOO_LONG'
 
 class MinLength(object):
@@ -31,7 +32,7 @@ class MinLength(object):
     def __call__(self, value, unuse, unuse_):
         if not value:
             return
-        if len(str(value)) < self._min_length:
+        if len(value) < self._min_length:
             return 'TOO_SHORT'
 
 class EqualLength(object):
@@ -41,9 +42,9 @@ class EqualLength(object):
     def __call__(self, value, unuse, unuse_):
         if not value:
             return
-        if len(str(value)) > self._length:
+        if len(value) > self._length:
             return 'TOO_LONG'
-        if len(str(value)) < self._length:
+        if len(value) < self._length:
             return 'TOO_SHORT'
 
 class BetweenLength(object):
@@ -56,9 +57,9 @@ class BetweenLength(object):
     def __call__(self, value, unuse, unuse_):
         if not value:
             return
-        if len(str(value)) > self._max_length:
+        if len(value) > self._max_length:
             return 'TOO_LONG'
-        if len(str(value)) < self._min_length:
+        if len(value) < self._min_length:
             return 'TOO_SHORT'
 
 class Like(object):
@@ -68,5 +69,5 @@ class Like(object):
     def __call__(self, value, unuse, unuse_):
         if not value:
             return
-        if not self._sample in value:
+        if not re.match(self._sample, str(value)):
             return 'WRONG_FORMAT'
