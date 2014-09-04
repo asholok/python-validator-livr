@@ -1,6 +1,5 @@
-import copy
+import BuildAliasedRule
 from LIVR import DEFAULT_RULES
-VALIDATOR_LIST = []
 IS_DEFAULT_AUTO_TRIM = False;
 
 class Validator(object):
@@ -16,19 +15,22 @@ class Validator(object):
         else:
             self.__is_auto_trim = is_auto_trim
         self.register_rules(DEFAULT_RULES)
-        VALIDATOR_LIST.append(self)
     
     @staticmethod
-    def register_defaulr_rules(rules):
-        global DEFAULT_RULES
-        DEFAULT_RULES = DEFAULT_RULES + rules
+    def register_default_rules(rules):
+        for name, rule in rules.iteritems():
+            DEFAULT_RULES[name] = rule
 
-        for validator in VALIDATOR_LIST:
-            validator.register_rules(DEFAULT_RULES)
+    @staticmethod
+    def register_aliased_default_rule(alias):
+        BuildAliasedRule(DEFAULT_RULES, alias)
 
     @staticmethod
     def set_default_auto_trim(is_auto_trim):
         IS_DEFAULT_AUTO_TRIM = bool(is_auto_trim)
+
+    def register_aliased_rule(self, alias):
+        BuildAliasedRule(self.__validator_builders, alias)
 
     def __make_validators(self, rules):
         if isinstance(rules, dict):
@@ -68,9 +70,6 @@ class Validator(object):
             
             for func in validators:
                 arg = result[field_name] if field_name in result else value
-###                
-                #print 'arg {}'.format(arg)
-###
                 error_code = func(arg, data, mid_result)
 
                 if error_code:
@@ -78,9 +77,6 @@ class Validator(object):
                     break
                 elif value != None:
                     result[field_name] = mid_result[0] if len(mid_result) else value
-###
-                    #print 'result[field_name] {}'.format(result[field_name])
-###
 
         if not errors:
             self.__errors = None
@@ -109,18 +105,17 @@ class Validator(object):
         else:
             name = livr_rule
             content = []
-
         return {"name": name, "args": content}
 
     def __build_validator(self, name, args):
         if not name in self.__validator_builders:
             raise Exception("Rule [{}] not registered".format(name))
-
         return self.__validator_builders[name](self.__validator_builders, *args)
 
     def __auto_trim(self, data):
         if type(data) is str:
             return data.strip()
+        
         elif type(data) is list:
             trimmed_list = []
             
@@ -128,6 +123,7 @@ class Validator(object):
                 trimmed_list.append(self.__auto_trim(val))
 
             return trimmed_list
+       
         elif type(data) is dict:
             trimmed_dict = {}
 

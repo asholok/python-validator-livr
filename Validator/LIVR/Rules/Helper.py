@@ -75,7 +75,7 @@ class ListOfObjects(object):
         if objects == None or objects == '':
             return
         if not isinstance(objects, dict) and not isinstance(objects, list):
-            return 'FORMAT_ERROR'
+            return 'FORMAT_ERROR'   
 
         return self._check_validation(objects, output)
 

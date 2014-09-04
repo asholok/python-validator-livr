@@ -71,3 +71,4 @@ class Like(object):
             return
         if not re.match(self._sample, str(value)):
             return 'WRONG_FORMAT'
+
