@@ -39,6 +39,8 @@ DEFAULT_RULES = {
 
     'email':            Special.Email,
     'equal_to_field':   Special.EqualToField,
+    'url':              Special.Url,
+    'iso_date':         Special.IsoDate,
 
     'nested_object':    Helper.NestedObject,
     'list_of':          Helper.ListOf,
@@ -47,6 +49,9 @@ DEFAULT_RULES = {
 
     'trim':             Filters.Trim,
     'to_lc':            Filters.ToLc,
-    'to_uc':            Filters.ToUc
+    'to_uc':            Filters.ToUc,
+    'remove':           Filters.Remove,
+    'leave_only':       Filters.LeaveOnly,
+
 }
 print PATH_TO_RULES

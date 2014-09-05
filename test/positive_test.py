@@ -9,9 +9,9 @@ from Validator import Validator
 class PositiveTests(object):
     def run(self):
         for root, dirs, files in os.walk(PATH_TO_NEGATIVE_TESTS):
-            self._curent_test = ''.join(root.split('/')[-1])
+            self._current_test = ''.join(root.split('/')[-1])
             files_path = ['/'.join([root,file_name]) for file_name in files]
-            print self._curent_test
+            print self._current_test
             self._check(self._prepare(files_path))
 
     def _prepare(self, files_path):
@@ -34,13 +34,13 @@ class PositiveTests(object):
         
         if result:
             if standart_output == result:
-                print 'Test \'{}\' is Passed!!'.format(self._curent_test)
+                print 'Test \'{}\' is Passed!!'.format(self._current_test)
             else:
-                print 'Test \'{}\' is NOT passed\nGives result:\n\n{}\n\nMust give:\n\n{}\n\n'.format(self._curent_test,
+                print 'Test \'{}\' is NOT passed\nGives result:\n\n{}\n\nMust give:\n\n{}\n\n'.format(self._current_test,
                                                                                                 result,
                                                                                                 standart_output)
         else:
-            print 'Test \'{}\' is NOT passed\nGives errors:\n\n{}\n\n Must give:\n\n{}\n\n'.format(self._curent_test,
+            print 'Test \'{}\' is NOT passed\nGives errors:\n\n{}\n\n Must give:\n\n{}\n\n'.format(self._current_test,
                                                                                                 current_errors,
                                                                                                 standart_output)
 

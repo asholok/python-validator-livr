@@ -1,5 +1,5 @@
 import re
-ESCAPE_RE = lambda string: string.replace(r'[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]', "\\$&")
+ESCAPE_RE = lambda string: string.replace('[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]', "\\$&")
 
 class Trim(object):
     def __init__(self, *args):
