@@ -46,18 +46,19 @@ class ListOf(object):
     def _check_validation(self, values, output):
         results = []
         errors = []
+        error_flag = False
 
         for val in values:
             result = self._validator.validate({'field': val})
             
             if result:
                 results.append(result['field'])
-                #errors.append(None)
+                errors.append(None)
             else:
+                error_flag = True
                 errors.append(self._validator.get_errors()['field'])
 
-
-        if errors:
+        if error_flag:
             return errors
 
         output.append(results)
@@ -82,6 +83,7 @@ class ListOfObjects(object):
     def _check_validation(self, objects, output):
         results = []
         errors = []
+        error_flag = False
 
         for obj in objects:
             if not isinstance(obj, dict):
@@ -91,14 +93,13 @@ class ListOfObjects(object):
             result = self._validator.validate(obj)
             
             if result:
-                #print 'result {}'.format(result)
                 results.append(result)
-                #errors.append(None)
+                errors.append(None)
             else:
-                #print 'error {}'.format(self._validator.get_errors())
+                error_flag = True
                 errors.append(self._validator.get_errors())
 
-        if errors:
+        if error_flag:
             return errors
 
         output.append(results)
@@ -121,6 +122,7 @@ class ListOfDiferentObjects(object):
     def __call__(self, objects, unuse, output):
         results = []
         errors = []
+        error_flag = False
 
         if not objects or objects == 0:
             return
@@ -140,10 +142,12 @@ class ListOfDiferentObjects(object):
 
             if result:
                 results.append(result)
+                errors.append(None)
             else:
+                error_flag = True
                 errors.append(validator.get_errors())
         
-        if errors:
+        if error_flag:
             return errors
 
         output.append(results)

@@ -23,7 +23,7 @@ class BuildAliasedRule(object):
         self.__validator.register_rules(self.__rule_builders)
         self.__validator.prepare()
 
-        return lambda value, unuse, output: self._validate(value, output)
+        return self._validate
 
     def _validate(self, value, output):
         result = self.__validator.validate({'value': value})

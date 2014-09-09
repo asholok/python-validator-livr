@@ -1,17 +1,18 @@
 import os
 import sys
+import unittest
 import yaml
-PATH_TO_NEGATIVE_TESTS = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/test_suite/positive'
+PATH_TO_POSITIVE_TESTS = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/test_suite/positive'
 PATH_TO_VALIDATOR = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])+'/Validator'
 sys.path.insert(0,PATH_TO_VALIDATOR)
 from Validator import Validator
 
-class PositiveTests(object):
-    def run(self):
-        for root, dirs, files in os.walk(PATH_TO_NEGATIVE_TESTS):
+class PositiveTests(unittest.TestCase):
+    def runTest(self):
+        for root, dirs, files in os.walk(PATH_TO_POSITIVE_TESTS):
             self._current_test = ''.join(root.split('/')[-1])
             files_path = ['/'.join([root,file_name]) for file_name in files]
-            print self._current_test
+
             self._check(self._prepare(files_path))
 
     def _prepare(self, files_path):
@@ -32,20 +33,23 @@ class PositiveTests(object):
         result = validator.validate(data['input'])
         current_errors = validator.get_errors()
         
-        if result:
-            if standart_output == result:
-                print 'Test \'{}\' is Passed!!'.format(self._current_test)
-            else:
-                print 'Test \'{}\' is NOT passed\nGives result:\n\n{}\n\nMust give:\n\n{}\n\n'.format(self._current_test,
-                                                                                                result,
-                                                                                                standart_output)
-        else:
-            print 'Test \'{}\' is NOT passed\nGives errors:\n\n{}\n\n Must give:\n\n{}\n\n'.format(self._current_test,
-                                                                                                current_errors,
-                                                                                                standart_output)
+        self.assertEqual(standart_output, result)
+
+        """ If need to debug uncoment next code"""
+        # if result:
+        #     if standart_output == result:
+        #         print 'Test \'{}\' is Passed!!'.format(self._current_test)
+        #     else:
+        #         print 'Test \'{}\' is NOT passed\nGives result:\n\n{}\n\nMust give:\n\n{}\n\n'.format(self._current_test,
+        #                                                                                         result,
+        #                                                                                         standart_output)
+        # else:
+        #     print 'Test \'{}\' is NOT passed\nGives errors:\n\n{}\n\n Must give:\n\n{}\n\n'.format(self._current_test,
+        #                                                                                         current_errors,
+        #                                                                                         standart_output)
 
 c = PositiveTests()
 
-c.run()
+c.runTest()
 
 
