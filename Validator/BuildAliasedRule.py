@@ -25,13 +25,11 @@ class BuildAliasedRule(object):
 
         return self._validate
 
-    def _validate(self, value, output):
+    def _validate(self, value, unuse, output):    
         result = self.__validator.validate({'value': value})
 
-        if result:
-            output.append(result['value'])
-        else:
-            if self._error:
-                return self._error
-            return self.__validator.get_errors()
+        if not result:
+            return self._error or self.__validator.get_errors()['value']
+        
+        output.append(result['value'])
 

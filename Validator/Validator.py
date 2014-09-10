@@ -23,14 +23,14 @@ class Validator(object):
 
     @staticmethod
     def register_aliased_default_rule(alias):
-        BuildAliasedRule(DEFAULT_RULES, alias)
+        BuildAliasedRule.BuildAliasedRule(DEFAULT_RULES, alias)
 
     @staticmethod
     def set_default_auto_trim(is_auto_trim):
         IS_DEFAULT_AUTO_TRIM = bool(is_auto_trim)
 
     def register_aliased_rule(self, alias):
-        BuildAliasedRule(self.__validator_builders, alias)
+        BuildAliasedRule.BuildAliasedRule(self.__validator_builders, alias)
 
     def __make_validators(self, rules):
         if isinstance(rules, dict):
