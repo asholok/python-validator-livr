@@ -1,5 +1,5 @@
 import BuildAliasedRule
-from LIVR import DEFAULT_RULES
+from DEFAULT_RULES import DEFAULT_RULES
 IS_DEFAULT_AUTO_TRIM = False;
 
 class Validator(object):

@@ -1,6 +1,6 @@
 import os
 import sys
-PATH_TO_RULES = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/LIVR/Rules'
+PATH_TO_RULES = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/Rules'
 sys.path.insert(0,PATH_TO_RULES)
 
 # from Common import *
@@ -54,4 +54,3 @@ DEFAULT_RULES = {
     'leave_only':       Filters.LeaveOnly,
 
 }
-print PATH_TO_RULES

@@ -1,6 +1,6 @@
 import sys
 import os
-ROOT_PATH = '/'.join(str(os.path.abspath(__file__)).split('/')[:-3])
+ROOT_PATH = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])
 sys.path.insert(0,ROOT_PATH)
 
 import Validator

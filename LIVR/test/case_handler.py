@@ -1,7 +1,7 @@
 import os
 import sys
 PATH_TO_TESTS_INV = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])
-PATH_TO_VALIDATOR = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])+'/Validator'
+PATH_TO_VALIDATOR = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])
 sys.path.insert(0,PATH_TO_VALIDATOR)
 import Validator
 import test_suite
