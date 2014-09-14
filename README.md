@@ -71,63 +71,69 @@ Features:
 
 # INSTALL
 
-Use npm for nodejs. For browser you can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version)
+
 
 # CLASS METHODS
 
-## new LIVR.Validator(livr, isAutoTrim);
+## Validator(livr, is\_auto\_trim);
 Contructor creates validator objects.
 livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
 
-isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
-if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
+is\_auto\_trim - asks validator to trim all values before validation. Output will be also trimmed.
+if is\_auto\_trim is undefined(or None) than default\_auto\_trim value will be used.
 
-## LIVR.Validator.registerDefaultRules({"rule\_name": ruleBuilder })
-ruleBuilder - is a function reference which will be called for building single rule validator.
-
-    LIVR.Validator.registerDefaultRules( "my_rule": function(arg1, arg2, arg3, ruleBuilders) {
-        // ruleBuilders - are rules from original validator 
-        // to allow you create new validator with all supported rules
-        // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
+## LIVR.Validator.registerDefaultRules({"rule\_name": rule\_builder })
+rule_builder - is a function reference which will be called for building single rule validator.
     
-        return function(value, allValues, outputArr) {            
-            if (notValid) {
-                return "SOME_ERROR_CODE";
-            }
-            else {
-                
-            }
-        }
-    });
+    class MyRule(object):
+        def __init__(self, *args):
+            rule_builders = args[0]
+            # rule_builders - are rules from original validator
+            # to allow you create new validator with all supported rules
+            # validator = Validator(livr)
+            # validator.register_rules(rule_builders)
+            # validator.prepare()
+
+        def __call__(self, value, all_values, output_array):
+            if not_valid:
+                return "SOME_ERROR_CODE"
+            else:
+                # some usefull code
+
+    Validator.register_default_rules( {"my_rule": MyRule} )
 
 Then you can use "my\_rule" for validation:
     
     {
-        name1: 'my_rule' // Call without parameters
-        name2: { 'my_rule': arg1 } // Call with one parameter.
-        name3: { 'my_rule': [arg1] } // Call with one parameter.
-        name4: { 'my_rule': [ arg1, arg2, arg3 ] } // Call with many parameters.
+        'name1': 'my_rule' // Call without parameters
+        'name2': { 'my_rule': arg1 } // Call with one parameter.
+        'name3': { 'my_rule': [arg1] } // Call with one parameter.
+        'name4': { 'my_rule': [ arg1, arg2, arg3 ] } // Call with many parameters.
     }
 
 Here is "max\_number" implemenation:
-
-    function maxNumber(maxNumber) {
-        return function(value) {
-            // We do not validate empty fields. We have "required" rule for this purpose
-            if (value === undefined || value === null || value === '' ) return;
     
-            // return error message
-            if ( value > maxNumber ) return 'TOO_HIGH';
-        };
-    };
-    LIVR.Validator.registerDefaultRules({ "max_number": maxNumber });
+    class MaxNumber(object):
+    def __init__(self, *args):
+        self._max_number = float(args[1])
+
+    def __call__(self, number, unuse, unuse_):
+        # We do not validate empty fields. We have "required" rule for this purpose
+        if number == None or number == '':
+            return
+
+        #return error message
+        if float(number) > self._max_number:
+            return 'TOO_HIGH'
+
+    Validator.register_default_rules({ "max_number": MaxNumber });
 
 All rules for the validator are equal. It does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
-## LIVR.Validator.getDefaultRules();
-returns object containing all default ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
+## Validator.get\_default\_rules()
+returns object containing all default rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
 
-## LIVR.Validator.defaultAutoTrim(isAutoTrim)
+## Validator.set\_default\_auto\_trim(is\_auto\_trim)
 Enables or disables automatic trim for input data. If is on then every new validator instance will have auto trim option enabled
 
 
@@ -136,15 +142,14 @@ Enables or disables automatic trim for input data. If is on then every new valid
 ## validator.validate(input)
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
 
-    my validaData = validator.validate(input)
+    valida_data = validator.validate(input)
 
-    if (validData) {
-        // use validData
-    } else {
-        var errors = validator.getErrors();
-    }
+    if valida_data: 
+        // use valida_data
+    else:
+        errors = validator.get_errors()
 
-## validator.getErrors()
+## validator.get\_errors()
 Returns errors object.
 
    {
@@ -162,17 +167,17 @@ For example:
         "building": "NOT_POSITIVE_INTEGER"
     }
 
-## validator.registerRules({"rule_name": ruleBuilder})
+## validator.register\_rules({"rule\_name": rule\_builder})
 
-ruleBuilder - is a function reference which will be called for building single rule validator.
+rule\_builder - is a function reference which will be called for building single rule validator.
 
-See "LIVR.Validator.registerDefaultRules" for rules examples.
+See "Validator.register\_default\_rules" for rules examples.
 
-## validator.getRules()
-returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
+## validator.get\_rules()
+returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "register\_rules" method.
 
 # AUTHOR
-koorchik (Viktor Turskyi)
+koorchik (Viktor Turskyi), asholok (Ihor Kolosha)
 
 # BUGS
-Please report any bugs or feature requests to Github https://github.com/koorchik/js-validator-livr
+Please report any bugs or feature requests to Github https://github.com/asholok/python-validator-livr

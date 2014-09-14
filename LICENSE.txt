@@ -1,4 +1,4 @@
-# LICENSE AND COPYRIGHT
+LICENSE AND COPYRIGHT
 
 Copyright 2012 Viktor Turskyi.
 
