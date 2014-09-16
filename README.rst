@@ -1,10 +1,12 @@
-# NAME
+NAME
+----
 LIVR.Validator - Lightweight validator supporting Language Independent Validation Rules Specification (LIVR)
 
-# SYNOPSIS
-Common usage:
+SYNOPSIS
+--------
+Common usage::
 
-    from Validator import Validator
+    from LIVR import Validator
     Validator.set_default_auto_trim(True)
 
     validator = Validator({
@@ -25,7 +27,7 @@ Common usage:
     
 
 
-You can use filters separately or can combine them with validation:
+You can use filters separately or can combine them with validation::
 
     validator = Validator({
         'email': [ 'required', 'trim', 'email', 'to_lc' ]
@@ -33,7 +35,7 @@ You can use filters separately or can combine them with validation:
     
 
 
-Feel free to register your own rules:
+Feel free to register your own rules::
 
     validator = Validator({
         'password': ['required', 'strong_password']
@@ -53,7 +55,9 @@ Feel free to register your own rules:
     validator.registerRules({ 'strong_password': StrongPassword})
 
 
-# DESCRIPTION
+DESCRIPTION
+-----------
+
 See http://livr-spec.org for detailed documentation and list of supported rules.
 
 Features:
@@ -66,24 +70,31 @@ Features:
  * Easy to describe and undersand rules
  * Returns understandable error codes(not error messages)
  * Easy to add own rules
- * Rules are be able to change results output ("trim", "nested\_object", for example)
+ * Rules are be able to change results output ("trim", "nested_object", for example)
  * Multipurpose (user input validation, configs validation, contracts programming etc)
 
-# INSTALL
+INSTALL
+-------
+Install LIVR from PyPI using PIP::
+    sudo pip install LIVR
 
+CLASS METHODS
+-------------
 
+Validator(livr, is_auto_trim)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# CLASS METHODS
-
-## Validator(livr, is\_auto\_trim);
 Contructor creates validator objects.
 livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
 
-is\_auto\_trim - asks validator to trim all values before validation. Output will be also trimmed.
-if is\_auto\_trim is undefined(or None) than default\_auto\_trim value will be used.
+is_auto_trim - asks validator to trim all values before validation. Output will be also trimmed.
+    if is_auto_trim is undefined(or None) than default_auto_trim value will be used.
 
-## LIVR.Validator.registerDefaultRules({"rule\_name": rule\_builder })
+
+LIVR.Validator.registerDefaultRules({"rule_name": rule_builder })
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 rule_builder - is a function reference which will be called for building single rule validator.
+::
     
     class MyRule(object):
         def __init__(self, *args):
@@ -102,16 +113,16 @@ rule_builder - is a function reference which will be called for building single 
 
     Validator.register_default_rules( {"my_rule": MyRule} )
 
-Then you can use "my\_rule" for validation:
+Then you can use "my_rule" for validation::
     
     {
-        'name1': 'my_rule' // Call without parameters
-        'name2': { 'my_rule': arg1 } // Call with one parameter.
-        'name3': { 'my_rule': [arg1] } // Call with one parameter.
-        'name4': { 'my_rule': [ arg1, arg2, arg3 ] } // Call with many parameters.
+        'name1': 'my_rule' # Call without parameters
+        'name2': { 'my_rule': arg1 } # Call with one parameter.
+        'name3': { 'my_rule': [arg1] } # Call with one parameter.
+        'name4': { 'my_rule': [ arg1, arg2, arg3 ] } # Call with many parameters.
     }
 
-Here is "max\_number" implemenation:
+Here is "max_number" implemenation::
     
     class MaxNumber(object):
     def __init__(self, *args):
@@ -128,30 +139,36 @@ Here is "max\_number" implemenation:
 
     Validator.register_default_rules({ "max_number": MaxNumber });
 
-All rules for the validator are equal. It does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
+All rules for the validator are equal. It does not distinguish "required", "list_of_different_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
-## Validator.get\_default\_rules()
+Validator.get_default_rules()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 returns object containing all default rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
 
-## Validator.set\_default\_auto\_trim(is\_auto\_trim)
+Validator.set_default_auto_trim(is_auto_trim)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Enables or disables automatic trim for input data. If is on then every new validator instance will have auto trim option enabled
 
 
-# OBJECT METHODS
+OBJECT METHODS
+--------------
 
-## validator.validate(input)
+validator.validate(input)
+~~~~~~~~~~~~~~~~~~~~~~~~~
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
+::
 
     valida_data = validator.validate(input)
 
     if valida_data: 
-        // use valida_data
+        #use valida_data
     else:
         errors = validator.get_errors()
 
-## validator.get\_errors()
+validator.get\_errors()
+~~~~~~~~~~~~~~~~~~~~~~~
 Returns errors object.
-
+::
    {
         "field1": "ERROR_CODE",
         "field2": "ERROR_CODE",
@@ -159,7 +176,7 @@ Returns errors object.
     }
 
 For example:
-
+::
     {
         "country":  "NOT_ALLOWED_VALUE",
         "zip":      "NOT_POSITIVE_INTEGER",
@@ -167,17 +184,21 @@ For example:
         "building": "NOT_POSITIVE_INTEGER"
     }
 
-## validator.register\_rules({"rule\_name": rule\_builder})
+validator.register_rules({"rule_name": rule_builder})
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-rule\_builder - is a function reference which will be called for building single rule validator.
+rule_builder - is a function reference which will be called for building single rule validator.
 
-See "Validator.register\_default\_rules" for rules examples.
+See "Validator.register_default_rules" for rules examples.
 
-## validator.get\_rules()
-returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "register\_rules" method.
+validator.get_rules()
+~~~~~~~~~~~~~~~~~~~~~
+returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "register_rules" method.
 
-# AUTHOR
+AUTHOR
+------
 koorchik (Viktor Turskyi), asholok (Ihor Kolosha)
 
-# BUGS
+BUGS
+----
 Please report any bugs or feature requests to Github https://github.com/asholok/python-validator-livr
