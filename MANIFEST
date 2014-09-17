@@ -5,6 +5,13 @@ LIVR/BuildAliasedRule.py
 LIVR/DEFAULT_RULES.py
 LIVR/Validator.py
 LIVR/__init__.py
+LIVR/Rules/Common.py
+LIVR/Rules/Filters.py
+LIVR/Rules/Helper.py
+LIVR/Rules/Numeric.py
+LIVR/Rules/Special.py
+LIVR/Rules/String.py
+LIVR/Rules/__init__.py
 LIVR/test/__init__.py
 LIVR/test/case_handler.py
 LIVR/test/test_suite.py

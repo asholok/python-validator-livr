@@ -5,7 +5,7 @@ with open('README.txt') as readme:
         name = 'LIVR',
         version = '0.4',
         author = 'Viktor Turstkiy, Ihor Kolosha',
-        packages = ['LIVR', 'LIVR.test'],
+        packages = ['LIVR', 'LIVR.test', 'LIVR.Rules'],
         license='look into README',
         description='LIVR validator.',
         long_description=readme.read(),

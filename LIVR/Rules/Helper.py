@@ -3,10 +3,9 @@ import os
 ROOT_PATH = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])
 sys.path.insert(0,ROOT_PATH)
 
-import Validator
-
 class NestedObject(object):
     def __init__(self, *args):
+            import Validator
             self._livr = args[1]
             self._rule_builders = args[0]
             self._validator = Validator.Validator(self._livr)
@@ -29,6 +28,7 @@ class NestedObject(object):
 
 class ListOf(object):
     def __init__(self, *args):
+        import Validator
         self._livr = args[1]
         self._rule_builders = args[0]
         self._validator = Validator.Validator({'field':self._livr})
@@ -65,6 +65,7 @@ class ListOf(object):
 
 class ListOfObjects(object):
     def __init__(self, *args):
+        import Validator
         self._livr = args[1]
         self._rule_builders = args[0]
         self._validator = Validator.Validator(self._livr)
@@ -106,6 +107,7 @@ class ListOfObjects(object):
 
 class ListOfDiferentObjects(object):
     def __init__(self, *args):
+        import Validator
         self._selector_fields = args[1]
         self._livrs = args[2]
         self._rule_builders = args[0]
