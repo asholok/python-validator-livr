@@ -13,9 +13,9 @@ SYNOPSIS
 Common usage::
 
     from LIVR import Validator
-    Validator.set_default_auto_trim(True)
+    Validator.Validator.set_default_auto_trim(True)
 
-    validator = Validator({
+    validator = Validator.Validator({
         'name':      'required',
         'email':     [ 'required', 'email' ],
         'gender':    { 'one_of' : [['male', 'female']] },
@@ -33,7 +33,7 @@ Common usage::
 
 You can use filters separately or can combine them with validation::
 
-    validator = Validator({
+    validator = Validator.Validator({
         'email': [ 'required', 'trim', 'email', 'to_lc' ]
     })
     
@@ -41,7 +41,7 @@ You can use filters separately or can combine them with validation::
 
 Feel free to register your own rules::
 
-    validator = Validator({
+    validator = Validator.Validator({
         'password': ['required', 'strong_password']
     })
     
@@ -84,8 +84,8 @@ Install LIVR from PyPI using PIP::
 CLASS METHODS
 =============
 
-Validator(livr, is_auto_trim)
------------------------------
+Validator.Validator(livr, is_auto_trim)
+---------------------------------------
 
 Contructor creates validator objects.
 livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
@@ -94,8 +94,8 @@ is_auto_trim - asks validator to trim all values before validation. Output will 
     if is_auto_trim is undefined(or None) than default_auto_trim value will be used.
 
 
-LIVR.Validator.registerDefaultRules({"rule_name": rule_builder })
------------------------------------------------------------------
+Validator.Validator.registerDefaultRules({"rule_name": rule_builder })
+----------------------------------------------------------------------
 
 rule_builder - is a function reference which will be called for building single rule validator.
 ::
@@ -115,7 +115,7 @@ rule_builder - is a function reference which will be called for building single 
             else:
                 # some usefull code
 
-    Validator.register_default_rules( {"my_rule": MyRule} )
+    Validator.Validator.register_default_rules( {"my_rule": MyRule} )
 
 Then you can use "my_rule" for validation::
     
@@ -141,16 +141,16 @@ Here is "max_number" implemenation::
         if float(number) > self._max_number:
             return 'TOO_HIGH'
 
-    Validator.register_default_rules({ "max_number": MaxNumber });
+    Validator.Validator.register_default_rules({ "max_number": MaxNumber });
 
 All rules for the validator are equal. It does not distinguish "required", "list_of_different_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
-Validator.get_default_rules()
------------------------------
+Validator.Validator.get_default_rules()
+---------------------------------------
 returns object containing all default rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
 
-Validator.set_default_auto_trim(is_auto_trim)
----------------------------------------------
+Validator.Validator.set_default_auto_trim(is_auto_trim)
+-------------------------------------------------------
 Enables or disables automatic trim for input data. If is on then every new validator instance will have auto trim option enabled
 
 
@@ -194,7 +194,7 @@ validator.register_rules({"rule_name": rule_builder})
 
 rule_builder - is a function reference which will be called for building single rule validator.
 
-See "Validator.register_default_rules" for rules examples.
+See "Validator.Validator.register_default_rules" for rules examples.
 
 validator.get_rules()
 ---------------------
