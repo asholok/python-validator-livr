@@ -79,6 +79,7 @@ Features:
 INSTALL
 =======
 Install LIVR from PyPI using PIP::
+
     sudo pip install LIVR
 
 CLASS METHODS
@@ -159,7 +160,7 @@ OBJECT METHODS
 
 validator.validate(input)
 -------------------------
-Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
+Validates user input. On success returns valid_data (contains only data that has described validation rules). On error return false.
 ::
 
     valida_data = validator.validate(input)
@@ -198,7 +199,7 @@ See "Validator.Validator.register_default_rules" for rules examples.
 
 validator.get_rules()
 ---------------------
-returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "register_rules" method.
+returns object containing all rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
 
 AUTHOR
 ======
