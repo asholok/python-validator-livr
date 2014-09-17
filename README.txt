@@ -1,9 +1,15 @@
+======
+README
+======
+
 NAME
-----
+====
+
 LIVR.Validator - Lightweight validator supporting Language Independent Validation Rules Specification (LIVR)
 
 SYNOPSIS
---------
+========
+
 Common usage::
 
     from LIVR import Validator
@@ -24,8 +30,6 @@ Common usage::
         save_user_data(valid_data);
     else:
         some_error_hendler(validator.get_errors())
-    
-
 
 You can use filters separately or can combine them with validation::
 
@@ -54,9 +58,8 @@ Feel free to register your own rules::
 
     validator.registerRules({ 'strong_password': StrongPassword})
 
-
 DESCRIPTION
------------
+===========
 
 See http://livr-spec.org for detailed documentation and list of supported rules.
 
@@ -74,15 +77,15 @@ Features:
  * Multipurpose (user input validation, configs validation, contracts programming etc)
 
 INSTALL
--------
+=======
 Install LIVR from PyPI using PIP::
     sudo pip install LIVR
 
 CLASS METHODS
--------------
+=============
 
 Validator(livr, is_auto_trim)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Contructor creates validator objects.
 livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
@@ -92,7 +95,8 @@ is_auto_trim - asks validator to trim all values before validation. Output will 
 
 
 LIVR.Validator.registerDefaultRules({"rule_name": rule_builder })
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------
+
 rule_builder - is a function reference which will be called for building single rule validator.
 ::
     
@@ -142,19 +146,19 @@ Here is "max_number" implemenation::
 All rules for the validator are equal. It does not distinguish "required", "list_of_different_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
 Validator.get_default_rules()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 returns object containing all default rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
 
 Validator.set_default_auto_trim(is_auto_trim)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 Enables or disables automatic trim for input data. If is on then every new validator instance will have auto trim option enabled
 
 
 OBJECT METHODS
---------------
+==============
 
 validator.validate(input)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
 ::
 
@@ -165,18 +169,19 @@ Validates user input. On success returns validData (contains only data that has 
     else:
         errors = validator.get_errors()
 
-validator.get\_errors()
-~~~~~~~~~~~~~~~~~~~~~~~
+validator.get_errors()
+----------------------
 Returns errors object.
 ::
+
    {
         "field1": "ERROR_CODE",
         "field2": "ERROR_CODE",
         ...
     }
 
-For example:
-::
+For example::
+    
     {
         "country":  "NOT_ALLOWED_VALUE",
         "zip":      "NOT_POSITIVE_INTEGER",
@@ -185,26 +190,26 @@ For example:
     }
 
 validator.register_rules({"rule_name": rule_builder})
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 rule_builder - is a function reference which will be called for building single rule validator.
 
 See "Validator.register_default_rules" for rules examples.
 
 validator.get_rules()
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "register_rules" method.
 
 AUTHOR
-------
+======
 koorchik (Viktor Turskyi), asholok (Ihor Kolosha)
 
 BUGS
-----
+====
 Please report any bugs or feature requests to Github https://github.com/asholok/python-validator-livr
 
 LICENSE AND COPYRIGHT
----------------------
+=====================
 
 Copyright 2012 Viktor Turskyi.
 
