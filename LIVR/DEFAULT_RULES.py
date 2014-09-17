@@ -3,13 +3,6 @@ import sys
 PATH_TO_RULES = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])+'/Rules'
 sys.path.insert(0,PATH_TO_RULES)
 
-# from Common import *
-# from Filters import *
-# from Helper import *
-# from Special import *
-# from String import *
-# from Numeric import *
-
 import Common
 import Filters
 import Helper
