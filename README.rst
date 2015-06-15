@@ -58,6 +58,18 @@ Feel free to register your own rules::
 
     validator.registerRules({ 'strong_password': StrongPassword})
 
+Also you can use aliases for some case, but you must ensure that in aliase dict present required kyes 'rules' and 'name'::
+
+    validator = Validator.Validator({
+        'password': ['required', 'strong_password']
+    })
+
+    validator.register_aliased_rule({
+        'name': 'strong_password',
+        'rules': {'min_length' : 9},
+        'error': 'WEAK_PASSWORD'
+    }) 
+
 DESCRIPTION
 ===========
 
@@ -121,9 +133,9 @@ rule_builder - is a function reference which will be called for building single 
 Then you can use "my_rule" for validation::
     
     {
-        'name1': 'my_rule' # Call without parameters
-        'name2': { 'my_rule': arg1 } # Call with one parameter.
-        'name3': { 'my_rule': [arg1] } # Call with one parameter.
+        'name1': 'my_rule', # Call without parameters
+        'name2': { 'my_rule': arg1 }, # Call with one parameter.
+        'name3': { 'my_rule': [arg1] }, # Call with one parameter.
         'name4': { 'my_rule': [ arg1, arg2, arg3 ] } # Call with many parameters.
     }
 
