@@ -6,6 +6,8 @@ NAME
 ====
 
 LIVR.Validator - Lightweight validator supporting Language Independent Validation Rules Specification (LIVR)
+    
+    Python 2 and 3 compatible
 
 SYNOPSIS
 ========
@@ -74,6 +76,7 @@ DESCRIPTION
 ===========
 
 See http://livr-spec.org for detailed documentation and list of supported rules.
+
 
 Features:
 
