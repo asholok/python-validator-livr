@@ -29,7 +29,7 @@ Common usage::
     valid_data = validator.validate(user_data)
     
     if valid_data:
-        save_user_data(valid_data);
+        save_user_data(valid_data)
     else:
         some_error_hendler(validator.get_errors())
 
