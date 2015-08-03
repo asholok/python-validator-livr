@@ -1,8 +1,8 @@
 import sys
 import os
-import internal_reactor
 ROOT_PATH = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])
 sys.path.insert(0,ROOT_PATH)
+import internal_reactor
 
 class NestedObject(object):
     def __init__(self, *args):
