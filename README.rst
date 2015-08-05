@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/asholok/python-validator-livr.svg?branch=master)](https://travis-ci.org/asholok/python-validator-livr)
+https://travis-ci.org/asholok/python-validator-livr.svg?branch=master
 
 ======
 README
@@ -22,7 +22,7 @@ Common usage::
     validator = Validator.Validator({
         'name':      'required',
         'email':     [ 'required', 'email' ],
-        'gender':    { 'one_of' : [['male', 'female']] },
+        'gender':    { 'one_of' : ['male', 'female'] },
         'phone':     { 'max_length' : 10 },
         'password':  [ 'required', {'min_length' : 10} ],
         'password2': { 'equal_to_field' : 'password' }
