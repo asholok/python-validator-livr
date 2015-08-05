@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 PATH_TO_TESTS_INV = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])
