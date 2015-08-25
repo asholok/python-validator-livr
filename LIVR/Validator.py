@@ -8,14 +8,8 @@ except ImportError:
     from . import DEFAULT_RULES
 
 class Validator(internal_reactor.InternalValidator):
-    def __init__(self, livr_rules, is_auto_trim = False):
-        self.__is_prepare = False
-        self.__livr_rules = livr_rules
-        self.__validators = {}
-        self.__validator_builders = {}
-        self.__errors = None
-        self.__is_auto_trim = is_auto_trim
-        
+    def __init__(self, livr_rules, is_auto_trim=False):
+        super(Validator, self).__init__(livr_rules, is_auto_trim=is_auto_trim)
         self.register_rules(DEFAULT_RULES.DEFAULT_RULES)
     
     @staticmethod
@@ -30,5 +24,8 @@ class Validator(internal_reactor.InternalValidator):
     @staticmethod
     def set_default_auto_trim(is_auto_trim):
         IS_DEFAULT_AUTO_TRIM = bool(is_auto_trim)
+
+    def register_aliased_rule(self, alias):
+        BuildAliasedRule.BuildAliasedRule(self._validator_builders, alias)
 
     
