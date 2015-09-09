@@ -1,5 +1,6 @@
 
-[![Build Status](https://travis-ci.org/asholok/python-validator-livr.svg?branch=master)](https://travis-ci.org/asholok/python-validator-livr)
+.. image:: https://travis-ci.org/asholok/python-validator-livr.svg
+    :target: https://travis-ci.org/asholok/python-validator-livr
 
 ======
 README
