@@ -7,10 +7,10 @@ class Email(object):
         pass
     
     def __call__(self, email, unuse, unuse_):
-        if not email:
-            return
         if not isinstance(email, str):
             return 'FORMAT_ERROR'            
+        if email == '':
+            return
         if not re.match(self._reg_exp_mail, email):
             return 'WRONG_EMAIL'
 
