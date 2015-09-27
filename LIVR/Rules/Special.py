@@ -6,11 +6,11 @@ class Email(object):
     def __init__(self, *args):
         pass
     
-    def __call__(self, email, unuse, unuse_):
+    def __call__(self, email=None, unuse=None, unuse_=None):
+        if email == '' or email == None:
+            return
         if not isinstance(email, str):
             return 'FORMAT_ERROR'            
-        if email == '':
-            return
         if not re.match(self._reg_exp_mail, email):
             return 'WRONG_EMAIL'
 

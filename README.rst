@@ -28,7 +28,7 @@ Common usage::
         'phone':     { 'max_length' : 10 },
         'password':  [ 'required', {'min_length' : 10} ],
         'password2': { 'equal_to_field' : 'password' }
-    });
+    })
     
     valid_data = validator.validate(user_data)
     
@@ -161,7 +161,7 @@ Here is "max_number" implemenation::
         if float(number) > self._max_number:
             return 'TOO_HIGH'
 
-    Validator.Validator.register_default_rules({ "max_number": MaxNumber });
+    Validator.Validator.register_default_rules({ "max_number": MaxNumber })
 
 All rules for the validator are equal. It does not distinguish "required", "list_of_different_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
@@ -233,7 +233,7 @@ LICENSE AND COPYRIGHT
 
 Copyright 2012 Viktor Turskyi.
 
-This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
+This program is free software, you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
 http://www.perlfoundation.org/artistic_license_2_0
 
