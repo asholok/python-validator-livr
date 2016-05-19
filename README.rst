@@ -35,7 +35,7 @@ Common usage::
     if valid_data:
         save_user_data(valid_data)
     else:
-        some_error_hendler(validator.get_errors())
+        some_error_handler(validator.get_errors())
 
 You can use filters separately or can combine them with validation::
 
@@ -55,14 +55,14 @@ Feel free to register your own rules::
         def __init__(self, *args):
             pass
 
-        def __call__(self, value, unuse, unuse):
+        def __call__(self, value, unuse, *args):
             value == None or value == '':
                 return
 
             if len(value) < 6:
                 return 'WEAK_PASSWORD'
 
-    validator.registerRules({ 'strong_password': StrongPassword})
+    validator.register_rules({ 'strong_password': StrongPassword})
 
 Also you can use aliases for some case, but you must ensure that in aliase dict present required kyes 'rules' and 'name'::
 
@@ -114,7 +114,7 @@ is_auto_trim - asks validator to trim all values before validation. Output will 
     if is_auto_trim is undefined(or None) than default_auto_trim value will be used.
 
 
-Validator.Validator.registerDefaultRules({"rule_name": rule_builder })
+Validator.Validator.register_default_rules({"rule_name": rule_builder })
 ----------------------------------------------------------------------
 
 rule_builder - is a function reference which will be called for building single rule validator.
@@ -146,7 +146,7 @@ Then you can use "my_rule" for validation::
         'name4': { 'my_rule': [ arg1, arg2, arg3 ] } # Call with many parameters.
     }
 
-Here is "max_number" implemenation::
+Here is "max_number" implementation::
     
     class MaxNumber(object):
     def __init__(self, *args):
