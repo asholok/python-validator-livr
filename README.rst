@@ -55,7 +55,7 @@ Feel free to register your own rules::
         def __init__(self, *args):
             pass
 
-        def __call__(self, value, unuse, unuse):
+        def __call__(self, value, unuse, *args):
             value == None or value == '':
                 return
 
