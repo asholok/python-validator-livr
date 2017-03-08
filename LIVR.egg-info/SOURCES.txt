@@ -10,12 +10,13 @@ LIVR.egg-info/SOURCES.txt
 LIVR.egg-info/dependency_links.txt
 LIVR.egg-info/top_level.txt
 LIVR/Rules/Common.py
-LIVR/Rules/Filters.py
-LIVR/Rules/Helper.py
+LIVR/Rules/Meta.py
+LIVR/Rules/Modifiers.py
 LIVR/Rules/Numeric.py
 LIVR/Rules/Special.py
 LIVR/Rules/String.py
 LIVR/Rules/__init__.py
+LIVR/Rules/constants.py
 LIVR/test/__init__.py
 LIVR/test/case_handler.py
 LIVR/test/livr_test.py
