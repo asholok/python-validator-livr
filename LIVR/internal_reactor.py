@@ -13,7 +13,6 @@ class InternalValidator(object):
             return [self._build_validator(**self._parse_rule({name:rule})) for name, rule in rules.items()]
         if isinstance(rules, list):
             return [self._build_validator(**self._parse_rule(rule)) for rule in rules]
-        
         return [self._build_validator(**self._parse_rule(rules))]
 
     def prepare(self):
@@ -21,10 +20,12 @@ class InternalValidator(object):
             return
         for name, rules in self._livr_rules.items():
             self._validators[name] = self._make_validators(rules)
-        
         self._is_prepare = True
     
     def validate(self, data):
+        errors = {}
+        result = {}
+
         if not self._is_prepare:
             self.prepare()
         if self._is_auto_trim:
@@ -32,15 +33,11 @@ class InternalValidator(object):
         if not isinstance(data, dict):
             self._error = "FORMAT_ERROR"
             return
-        
-        errors  = {}
-        result = {}
 
         for field_name, validators in self._validators.items():
             if not validators:
                 continue
-
-            mid_result   = []
+            mid_result = []
             value = data[field_name] if field_name in data else None
             
             for func in validators:
@@ -54,7 +51,6 @@ class InternalValidator(object):
                     result[field_name] = mid_result[-1] 
                 elif field_name in data and not field_name in result:
                     result[field_name] = value
-
 
         if not errors:
             self._errors = None
@@ -99,7 +95,6 @@ class InternalValidator(object):
             
             for val in data:
                 trimmed_list.append(self._auto_trim(val))
-
             return trimmed_list
        
         elif type(data) is dict:
@@ -107,9 +102,5 @@ class InternalValidator(object):
 
             for key in data:
                 trimmed_dict[key] = self._auto_trim(data[key])
-
             return trimmed_dict
-
         return data
-
-
