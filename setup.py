@@ -14,5 +14,5 @@ setup(
     license='look into README',
     description='LIVR validator.',
     long_description=long_description,
-    url='https://github.com/asholok/python-validator-livr',
+    url='https://github.com/asholok/python-validator-livr'
 )
