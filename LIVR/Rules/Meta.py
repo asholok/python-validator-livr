@@ -160,10 +160,8 @@ class Or(object):
     def __init__(self, *args):
         rule_builders = args[0]
         self._validators =  [] 
-        # print '-----------args-----------', args[1:]
         self.rules = args[1:]
         for rule in args[1:]:
-            # print '==========rule============', rule
             validator = internal_reactor.InternalValidator({'field': rule})
             
             validator.register_rules(rule_builders)

@@ -27,7 +27,6 @@ def negative_test(data, current_test):
     return [data['errors'], validator.get_errors()]
 
 def positive_test(data, current_test):
-    print('Test \'{0}\' Start!!'.format(current_test))
     if not 'rules' in data or not 'input' in data or not 'output' in data:
         return
     validator = Validator.Validator(data['rules'])
