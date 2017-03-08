@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: LIVR
-Version: 0.4.31
+Version: 2.0
 Summary: LIVR validator.
 Home-page: https://github.com/asholok/python-validator-livr
 Author: Ihor Kolosha, Viktor Turstkiy
@@ -185,6 +185,7 @@ Description:
         OBJECT METHODS
         ==============
         
+        
         validator.validate(input)
         -------------------------
         Validates user input. On success returns valid_data (contains only data that has described validation rules). On error return false.
@@ -196,6 +197,7 @@ Description:
                 #use valida_data
             else:
                 errors = validator.get_errors()
+        
         
         validator.get_errors()
         ----------------------
@@ -217,6 +219,7 @@ Description:
                 "building": "NOT_POSITIVE_INTEGER"
             }
         
+        
         validator.register_rules({"rule_name": rule_builder})
         -----------------------------------------------------
         
@@ -224,9 +227,19 @@ Description:
         
         See "Validator.Validator.register_default_rules" for rules examples.
         
+        
         validator.get_rules()
         ---------------------
+        
         returns object containing all rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
+        
+        
+        validator.register_aliased_rule(alias)
+        ------------------------------------
+        
+        alias - is a composite validation rule.
+        
+        See "Validator.Validator.register_aliased_rule" for rules examples.
         
         AUTHOR
         ======
