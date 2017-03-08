@@ -177,6 +177,7 @@ Enables or disables automatic trim for input data. If is on then every new valid
 OBJECT METHODS
 ==============
 
+
 validator.validate(input)
 -------------------------
 Validates user input. On success returns valid_data (contains only data that has described validation rules). On error return false.
@@ -188,6 +189,7 @@ Validates user input. On success returns valid_data (contains only data that has
         #use valida_data
     else:
         errors = validator.get_errors()
+
 
 validator.get_errors()
 ----------------------
@@ -209,6 +211,7 @@ For example::
         "building": "NOT_POSITIVE_INTEGER"
     }
 
+
 validator.register_rules({"rule_name": rule_builder})
 -----------------------------------------------------
 
@@ -216,9 +219,19 @@ rule_builder - is a function reference which will be called for building single 
 
 See "Validator.Validator.register_default_rules" for rules examples.
 
+
 validator.get_rules()
 ---------------------
+
 returns object containing all rule_builders for the validator. You can register new rule or update existing one with "register_rules" method.
+
+
+validator.register_aliased_rule(alias)
+------------------------------------
+
+alias - is a composite validation rule.
+
+See "Validator.Validator.register_aliased_rule" for rules examples.
 
 AUTHOR
 ======

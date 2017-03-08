@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import os
 import sys
 PATH_TO_TESTS_INV = '/'.join(str(os.path.abspath(__file__)).split('/')[:-1])
@@ -17,17 +18,18 @@ def negative_test(data, current_test):
     standard_errors = data['errors']
     current_errors = validator.get_errors()
     if standard_errors == current_errors:
-      print('Test \'{0}\' is Passed!!'.format(current_test))
+        print('Test \'{0}\' is Passed!!'.format(current_test))
     else:
-      print('Test \'{0}\' is NOT passed \n Gives:\n\n{}\n\n Must give:\n\n{}\n\n'.format(current_test,
+        print('Test \'{}\' is NOT passed \n Gives:\n\n{}\n\n Must give:\n\n{}\n\n'.format(current_test,
                                                                                         current_errors,
                                                                                         standard_errors))
 
     return [data['errors'], validator.get_errors()]
 
 def positive_test(data, current_test):
+    print('Test \'{0}\' Start!!'.format(current_test))
     if not 'rules' in data or not 'input' in data or not 'output' in data:
-            return
+        return
     validator = Validator.Validator(data['rules'])
     result = validator.validate(data['input'])
 
@@ -96,8 +98,8 @@ def aliase_positive_test(data, current_test):
 if __name__ == "__main__":
     test_engine = TestSuite()
 
-    test_engine.runTest(PATH_TO_TESTS_INV+'/test_suite/positive', positive_test)
-    test_engine.runTest(PATH_TO_TESTS_INV+'/test_suite/negative', negative_test)
-    test_engine.runTest(PATH_TO_TESTS_INV+'/test_suite/aliases_negative', aliase_negative_test)
-    test_engine.runTest(PATH_TO_TESTS_INV+'/test_suite/aliases_positive', aliase_positive_test)
+    test_engine.runTest(PATH_TO_TESTS_INV + '/test_suite/positive', positive_test)
+    test_engine.runTest(PATH_TO_TESTS_INV + '/test_suite/negative', negative_test)
+    test_engine.runTest(PATH_TO_TESTS_INV + '/test_suite/aliases_negative', aliase_negative_test)
+    test_engine.runTest(PATH_TO_TESTS_INV + '/test_suite/aliases_positive', aliase_positive_test)
     

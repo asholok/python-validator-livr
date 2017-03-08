@@ -19,7 +19,6 @@ class InternalValidator(object):
     def prepare(self):
         if self._is_prepare:
             return
-
         for name, rules in self._livr_rules.items():
             self._validators[name] = self._make_validators(rules)
         
@@ -41,7 +40,7 @@ class InternalValidator(object):
             if not validators:
                 continue
 
-            mid_result = []
+            mid_result   = []
             value = data[field_name] if field_name in data else None
             
             for func in validators:
@@ -51,8 +50,11 @@ class InternalValidator(object):
                 if error_code:
                     errors[field_name] = error_code
                     break
-                elif value != None:
-                    result[field_name] = mid_result[0] if len(mid_result) else value
+                elif len(mid_result):
+                    result[field_name] = mid_result[-1] 
+                elif field_name in data and not field_name in result:
+                    result[field_name] = value
+
 
         if not errors:
             self._errors = None
