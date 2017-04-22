@@ -19,11 +19,11 @@ def formatize_numeric_value(value):
     if isinstance(value, str):
         try:
             return int(value)
-        except ValueError, e:
+        except ValueError:
             pass
         try:
             return float(value)
-        except ValueError, e:
+        except ValueError:
             pass
     return value
 
