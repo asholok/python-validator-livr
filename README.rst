@@ -227,7 +227,7 @@ returns object containing all rule_builders for the validator. You can register 
 
 
 validator.register_aliased_rule(alias)
-------------------------------------
+--------------------------------------
 
 alias - is a composite validation rule.
 

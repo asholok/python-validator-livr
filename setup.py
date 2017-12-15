@@ -8,7 +8,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 setup(
     name='LIVR',
-    version='2.0',
+    version='2.0.1',
     author='Ihor Kolosha, Viktor Turstkiy',
     packages=find_packages(),
     license='look into README',
