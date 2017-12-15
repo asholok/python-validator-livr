@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: LIVR
-Version: 2.0
+Version: 2.0.1
 Summary: LIVR validator.
 Home-page: https://github.com/asholok/python-validator-livr
 Author: Ihor Kolosha, Viktor Turstkiy
@@ -235,7 +235,7 @@ Description:
         
         
         validator.register_aliased_rule(alias)
-        ------------------------------------
+        --------------------------------------
         
         alias - is a composite validation rule.
         
