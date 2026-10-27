@@ -1,5 +1,14 @@
 {
     "first_name": "required",
     "last_name": ["required"],
-    "middle_name": [ { "required": [] } ]
+    "middle_name": [ { "required": [] } ],
+
+    "value_is_hash":        "required",
+    "value_is_empty_hash":  "required",
+    "value_is_array":       "required",
+    "value_is_empty_array": "required",
+
+    "constructor":    "required",
+    "toString":       "required",
+    "hasOwnProperty": "required"
 }

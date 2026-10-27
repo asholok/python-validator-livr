@@ -1,4 +1,10 @@
 
+try:
+    STRING_TYPES = (str, unicode)
+except NameError:
+    STRING_TYPES = (str,)
+
+
 class InternalValidator(object):
     def __init__(self, livr_rules, is_auto_trim = False):
         self._is_prepare = False
@@ -29,10 +35,10 @@ class InternalValidator(object):
         if not self._is_prepare:
             self.prepare()
         if self._is_auto_trim:
-            self._auto_trim(data)
+            data = self._auto_trim(data)
         if not isinstance(data, dict):
-            self._error = "FORMAT_ERROR"
-            return
+            self._errors = "FORMAT_ERROR"
+            return False
 
         for field_name, validators in self._validators.items():
             if not validators:
@@ -87,7 +93,7 @@ class InternalValidator(object):
         return self._validator_builders[name](self._validator_builders, *args)
 
     def _auto_trim(self, data):
-        if type(data) is str:
+        if isinstance(data, STRING_TYPES):
             return data.strip()
         
         elif type(data) is list:

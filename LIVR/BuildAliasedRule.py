@@ -29,10 +29,12 @@ class BuildAliasedRule(object):
         return self._validate
 
     def _validate(self, value, unuse, output):    
-        result = self.__validator.validate({'value': value})
+        # A missing value stays missing: the rules get no field
+        result = self.__validator.validate({} if value is None else {'value': value})
 
-        if not result:
+        if result is False:
             return self._error or self.__validator.get_errors()['value']
         
-        output.append(result['value'])
+        if 'value' in result:
+            output.append(result['value'])
 

@@ -1,0 +1,38 @@
+name: test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python LIVR/test/case_handler.py
+      - run: python LIVR/test/features_test.py
+      - run: pip install .
+      - name: Check the installed package
+        run: |
+          python -c 'from LIVR import Validator; assert Validator.Validator({"a": "integer"}).validate({"a": "1"}) == {"a": 1}'
+        working-directory: /tmp
+
+  test-python2:
+    name: Python 2.7
+    runs-on: ubuntu-latest
+    container: python:2.7
+    steps:
+      - uses: actions/checkout@v7
+      - run: python LIVR/test/case_handler.py
+      - run: python LIVR/test/features_test.py
+      - run: pip install .
+      - name: Check the installed package
+        run: |
+          python -c 'from LIVR import Validator; assert Validator.Validator({"a": "integer"}).validate({"a": "1"}) == {"a": 1}'
+        working-directory: /tmp

@@ -9,6 +9,15 @@ except ImportError:
     from . import constants
     from . import internal_reactor
 
+def get_selected_validator(validators, obj, selector_field):
+    # The selector value must be a primitive value listed in livrs
+    if not isinstance(obj, dict):
+        return
+    selector = obj.get(selector_field)
+    if constants.EMPTY_PRIMITIVE(selector) or not isinstance(selector, constants.PRIMITIVE_LIST):
+        return
+    return validators.get(constants.TO_STRING(selector))
+
 class NestedObject(object):
     def __init__(self, *args):
         _livr = args[1]
@@ -19,21 +28,22 @@ class NestedObject(object):
         self._validator.prepare()
 
     def __call__(self, nested_obj, unuse, output):
-        if not nested_obj or nested_obj == 0:
+        if constants.EMPTY_PRIMITIVE(nested_obj):
             return
         if not isinstance(nested_obj, dict):
             return 'FORMAT_ERROR'
 
         result = self._validator.validate(nested_obj)
 
-        if not result:  
+        if result is False:
             return self._validator.get_errors()
 
         output.append(result) 
 
 class ListOf(object):
     def __init__(self, *args):
-        _livr = args[1]
+        # {"list_of": [["required", "integer"]]} or {"list_of": ["required", "integer"]}
+        _livr = args[1] if isinstance(args[1], list) else list(args[1:])
         _rule_builders = args[0]
         self._validator = internal_reactor.InternalValidator({'field':_livr})
 
@@ -41,9 +51,9 @@ class ListOf(object):
         self._validator.prepare()
 
     def __call__(self, values, unuse, output):   
-        if not values or values == 0:
+        if constants.EMPTY_PRIMITIVE(values):
             return
-        if not isinstance(values, dict) and not isinstance(values, list):
+        if not isinstance(values, list):
             return 'FORMAT_ERROR'
         return self._check_validation(values, output)
 
@@ -79,7 +89,7 @@ class ListOfObjects(object):
     def __call__(self, objects, unuse, output):
         if objects == None or objects == '':
             return
-        if not isinstance(objects, dict) and not isinstance(objects, list):
+        if not isinstance(objects, list):
             return 'FORMAT_ERROR'   
 
         return self._check_validation(objects, output)
@@ -91,12 +101,13 @@ class ListOfObjects(object):
 
         for obj in objects:
             if not isinstance(obj, dict):
+                error_flag = True
                 errors.append('FORMAT_ERROR')
                 continue
 
             result = self._validator.validate(obj)
             
-            if result:
+            if result is not False:
                 results.append(result)
                 errors.append(None)
             else:
@@ -127,23 +138,21 @@ class ListOfDiferentObjects(object):
         errors = []
         error_flag = False
 
-        if not objects or objects == 0:
+        if constants.EMPTY_PRIMITIVE(objects):
             return
         if not isinstance(objects, list):
             return 'FORMAT_ERROR'
 
         for obj in objects:
-            if not isinstance(obj, dict) and not self._selector_fields in obj:
-                errors.append("FORMAT_ERROR")
-                continue
-            if not obj[self._selector_fields] in self._validators:
+            validator = get_selected_validator(self._validators, obj, self._selector_fields)
+            if validator is None:
+                error_flag = True
                 errors.append("FORMAT_ERROR")
                 continue
 
-            validator = self._validators[obj[self._selector_fields]]
             result = validator.validate(obj)
 
-            if result:
+            if result is not False:
                 results.append(result)
                 errors.append(None)
             else:
@@ -171,13 +180,15 @@ class Or(object):
     def __call__(self, value, unuse, output):
         last_error = None
 
-        if constants.EMPTY_PRIMITIVE(value):
-            return
-        for validator in self._validators:
-            result = validator.validate({'field': value})
+        # A missing value stays missing: the rules get no field
+        data = {} if value is None else {'field': value}
 
-            if result:
-                output.append(result['field'])
+        for validator in self._validators:
+            result = validator.validate(data)
+
+            if result is not False:
+                if 'field' in result:
+                    output.append(result['field'])
                 return
             else:
                 last_error = validator.get_errors()['field']
@@ -203,14 +214,12 @@ class VariableObject(object):
     def __call__(self, obj, unuse, output):
         if constants.EMPTY_PRIMITIVE(obj):
             return
-        if not isinstance(obj, dict) and not self._selector_fields in obj:
-            return "FORMAT_ERROR"
-        if not obj[self._selector_fields] in self._validators:
+        validator = get_selected_validator(self._validators, obj, self._selector_fields)
+        if validator is None:
             return "FORMAT_ERROR"
 
-        validator = self._validators[obj[self._selector_fields]]
         result = validator.validate(obj)
-        if result:
+        if result is not False:
             output.append(result)
             return
         return validator.get_errors()

@@ -4,7 +4,7 @@ try:
 except ImportError:
     from . import constants
 
-ESCAPE_RE = lambda string: string.replace('[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]', "\\$&")
+ESCAPE_RE = lambda string: re.escape(string)
 
 class Default(object):
     def __init__(self, *args):
@@ -23,7 +23,7 @@ class Trim(object):
         if value == None or value == '' or isinstance(value, constants.OBJECTS_LIST):
             return
 
-        output.append(str(value).strip())
+        output.append(constants.TO_STRING(value).strip())
 
 
 class ToLc(object):
@@ -33,7 +33,7 @@ class ToLc(object):
     def __call__(self, value, unuse, output):
         if value == None or value == '' or isinstance(value, constants.OBJECTS_LIST):
             return
-        output.append(str(value).lower())
+        output.append(constants.TO_STRING(value).lower())
 
 
 class ToUc(object):
@@ -44,7 +44,7 @@ class ToUc(object):
         if value == None or value == '' or isinstance(value, constants.OBJECTS_LIST):
             return
 
-        output.append(str(value).upper())
+        output.append(constants.TO_STRING(value).upper())
 
 
 class Remove(object):
@@ -52,10 +52,10 @@ class Remove(object):
         self._chars = ESCAPE_RE(args[1])
 
     def __call__(self, value, unuse, output):
-        if value == None or value == '' or not isinstance(value, str):
+        if value == None or value == '' or not isinstance(value, constants.STRING_TYPES):
             return
 
-        output.append(re.sub('[{}]'.format(self._chars), '', value))
+        output.append(re.sub('[' + self._chars + ']', '', value))
 
 
 class LeaveOnly(object):
@@ -63,7 +63,7 @@ class LeaveOnly(object):
         self._chars = ESCAPE_RE(args[1])
 
     def __call__(self, value, unuse, output):
-        if value == None or value == '' or not isinstance(value, str):
+        if value == None or value == '' or not isinstance(value, constants.STRING_TYPES):
             return
 
-        output.append(re.sub('[^{}]'.format(self._chars), '', value))
+        output.append(re.sub('[^' + self._chars + ']', '', value))

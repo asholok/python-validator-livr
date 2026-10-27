@@ -1,6 +1,6 @@
 
-.. image:: https://travis-ci.org/asholok/python-validator-livr.svg
-    :target: https://travis-ci.org/asholok/python-validator-livr
+.. image:: https://github.com/asholok/python-validator-livr/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/asholok/python-validator-livr/actions/workflows/test.yml
 
 ======
 README

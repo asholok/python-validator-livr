@@ -16,7 +16,7 @@ def basic_integer_check(func):
     return dec
 
 def formatize_numeric_value(value):
-    if isinstance(value, str):
+    if isinstance(value, constants.STRING_TYPES):
         try:
             return int(value)
         except ValueError:
@@ -34,7 +34,7 @@ class Integer(object):
 
     @basic_integer_check
     def __call__(self, value, unuse, output):
-        if not re.match("^-?[0-9]+$", str(value)):
+        if not re.match(r"^-?[0-9]+\Z", constants.TO_STRING(value)):
             return 'NOT_INTEGER'
         output.append(int(value))
 
@@ -44,7 +44,7 @@ class PositiveInteger(object):
 
     @basic_integer_check
     def __call__(self, value, unuse, output):
-        if not re.match("^[1-9][0-9]*$", str(value)):
+        if not re.match(r"^[1-9][0-9]*\Z", constants.TO_STRING(value)):
             return 'NOT_POSITIVE_INTEGER'
         output.append(int(value))
 
@@ -54,7 +54,7 @@ class Decimal(object):
 
     @basic_integer_check
     def __call__(self, value, unuse, output):
-        if not re.match("^(?:\-?(?:[0-9]+\.[0-9]+)|(?:[0-9]+))$", str(value)):
+        if not re.match(r"^(?:\-?(?:[0-9]+\.[0-9]+)|(?:[0-9]+))\Z", constants.TO_STRING(value)):
             return 'NOT_DECIMAL'
         output.append(formatize_numeric_value(value))
 
@@ -64,7 +64,9 @@ class PositiveDecimal(object):
 
     @basic_integer_check
     def __call__(self, value, unuse, output):
-        if not re.match("^(?:(?:[0-9]*\.[0-9]+)|(?:[1-9][0-9]*))$", str(value)):
+        if not re.match(r"^(?:(?:[0-9]*\.[0-9]+)|(?:[1-9][0-9]*))\Z", constants.TO_STRING(value)):
+            return 'NOT_POSITIVE_DECIMAL'
+        if float(value) <= 0:
             return 'NOT_POSITIVE_DECIMAL'
         output.append(formatize_numeric_value(value))
 
