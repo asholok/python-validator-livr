@@ -95,6 +95,42 @@ Features:
  * Rules are be able to change results output ("trim", "nested_object", for example)
  * Multipurpose (user input validation, configs validation, contracts programming etc)
 
+LIVR 2.5
+========
+
+The validator supports LIVR 2.5 (https://github.com/koorchik/LIVR/blob/master/drafts/v2.5.md, changes:
+https://livr-spec.org/changes.html#v2-5). LIVR 2.5 only adds rules to LIVR 2.0, so the schemas of LIVR 2.0 keep
+working, except for the small fixes in section 1 of the specification (see the notes below)::
+
+    validator = Validator.Validator({
+        'subscribe':  'boolean',
+        'email':      ['email', { 'when': ['subscribe', ['boolean', { 'eq': True }], 'required'] }],
+        'tags':       [{ 'split': ',' }, { 'list_length': [1, 10] }, 'unique'],
+        'birth_date': { 'iso_date': { 'max': 'today' } },
+        'starts_at':  { 'iso_datetime': { 'min': 'tomorrow' } },
+        'vat':        { 'required_if': { 'company/country': 'UA' } },
+        'server':     { 'or': ['hostname', 'ip'] }
+    })
+
+Rules added in LIVR 2.5: boolean, not_one_of, max_decimals, digits, starts_with, ends_with, contains, iso_datetime,
+iso_time, required_if, when, keys, values, any, list_length, unique, split, uuid, ip, cidr, hostname, base64, hex,
+digest, mongo_id, hex_color, mac, e164, semver, jwt, luhn, credit_card, iban. iso_date takes the bounds "min" and
+"max" (added in LIVR 2.5).
+
+ * A wrong argument of a rule (``{'boolean': 1}``, ``{'iso_date': 'today'}``) raises an exception when the validator
+   is built: in ``validator.prepare()`` or in the first ``validator.validate()``.
+ * The rules of an alias and of an "or" branch see the siblings of the field, so ``equal_to_field`` works there.
+   The rules of a "list_of" item see no fields.
+ * "today", "yesterday" and "tomorrow" are the current date in UTC, from ``time.time()``. To fix the time in tests,
+   use freezegun or replace ``Dates.utc_now`` (a function that returns Unix time in seconds), as
+   ``LIVR/test/case_handler.py`` does.
+ * Booleans are "true" and "false" in string rules, so ``{'eq': True}`` accepts ``True`` and ``"true"``.
+   ``eq``, ``one_of``, ``equal_to_field`` and the selectors of ``variable_object`` keep matching the form of 2.0,
+   ``"True"`` and ``"False"``, too.
+ * ``{'rule': None}`` is one ``None`` argument. The new rules take no ``None``, so ``{'boolean': None}`` raises
+   an exception; the rules of LIVR 2.0 and custom rules get ``None`` as before. ``{'iso_date': None}`` stays
+   ``'iso_date'``, as LIVR 2.0 ignored the arguments of ``iso_date``.
+
 INSTALL
 =======
 Install LIVR from PyPI using PIP::
