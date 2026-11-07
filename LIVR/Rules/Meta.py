@@ -5,9 +5,11 @@ sys.path.insert(0,ROOT_PATH)
 try:
     import constants
     import internal_reactor
+    import Helper
 except ImportError:
     from . import constants
     from . import internal_reactor
+    from . import Helper
 
 def get_selected_validator(validators, obj, selector_field):
     # The selector value must be a primitive value listed in livrs
@@ -19,6 +21,21 @@ def get_selected_validator(validators, obj, selector_field):
     for form in constants.COMPARISON_FORMS(selector):
         if form in validators:
             return validators[form]
+
+def build_field_validator(rule_builders, rules, rule_name=None):
+    # A validator of one field, "field", with rules in any form that a field accepts. The new
+    # rules that take rules reject an empty rule list, also inside a rule list: use "any" for no rules
+    if rule_name and isinstance(rules, list):
+        if not rules:
+            Helper.schema_error(rule_name, 'an empty rule list, use "any" for no rules')
+        for rule in rules:
+            if isinstance(rule, list):
+                Helper.schema_error(rule_name, 'a rule list inside a rule list')
+    validator = internal_reactor.InternalValidator({'field': rules})
+
+    validator.register_rules(rule_builders)
+    validator.prepare()
+    return validator
 
 class NestedObject(object):
     def __init__(self, *args):
@@ -223,3 +240,89 @@ class VariableObject(object):
             return
         return validator.get_errors()
 
+
+class When(object):
+    # {"when": [REFERENCE, CONDITION, RULES_IF_TRUE, RULES_IF_FALSE]} or {"when": [REFERENCE, CASES]}
+    def __init__(self, *args):
+        rule_builders = args[0]
+        args = args[1:5]
+        if len(args) < 2:
+            Helper.schema_error('when', 'a reference and rules are required')
+        self._reference = Helper.parse_reference('when', args[0])
+
+        if len(args) == 2:
+            cases = args[1]
+            if not isinstance(cases, dict) or not cases:
+                Helper.schema_error('when', 'cases must be an object with at least one key')
+            self._cases = {}
+            for key, rules in cases.items():
+                self._cases[key] = build_field_validator(rule_builders, rules, 'when')
+            return
+
+        self._cases = None
+        self._condition, self._if_true = [build_field_validator(rule_builders, rules, 'when') for rules in args[1:3]]
+        self._if_false = build_field_validator(rule_builders, args[3], 'when') if len(args) > 3 else None
+
+    def __call__(self, value, all_values, output):
+        other = Helper.get_reference(all_values, self._reference)
+
+        if self._cases is not None:
+            validator = None
+            if not Helper.is_empty(other) and Helper.is_primitive(other):
+                validator = self._cases.get(Helper.string_form(other))
+            if validator is None:
+                return None if Helper.is_empty(value) else 'NOT_ALLOWED_VALUE'
+        else:
+            # The condition is true for a filled referenced value that passes its rules
+            is_true = not Helper.is_empty(other) and not self._condition.validate_field('field', other, all_values, [])
+            validator = self._if_true if is_true else self._if_false
+            if validator is None:
+                return
+
+        return validator.validate_field('field', value, all_values, output)
+
+
+class Values(object):
+    def __init__(self, *args):
+        self._validator = build_field_validator(args[0], Helper.rules_argument('values', args), 'values')
+
+    def __call__(self, obj, unuse, output):
+        if constants.EMPTY_PRIMITIVE(obj):
+            return
+        if not isinstance(obj, dict):
+            return 'FORMAT_ERROR'
+
+        results = {}
+        errors = {}
+        for key, value in obj.items():
+            # Values have no containing object: a reference in their rules is a missing value
+            result = []
+            error_code = self._validator.validate_field('field', value, {}, result)
+            if error_code:
+                errors[key] = error_code
+            else:
+                results[key] = result[0] if result else value
+
+        if errors:
+            return errors
+        output.append(results)
+
+
+class Keys(object):
+    def __init__(self, *args):
+        self._validator = build_field_validator(args[0], Helper.rules_argument('keys', args), 'keys')
+
+    def __call__(self, obj, unuse, output):
+        if constants.EMPTY_PRIMITIVE(obj):
+            return
+        if not isinstance(obj, dict):
+            return 'FORMAT_ERROR'
+
+        # The rules only check the keys, their output is ignored
+        errors = {}
+        for key in obj:
+            if self._validator.validate_field('field', key, {}, []):
+                errors[key] = 'WRONG_KEY'
+
+        if errors:
+            return errors

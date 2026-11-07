@@ -1,12 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
-import datetime
 
 try:
     import constants
+    import Dates
 except ImportError:
     from . import constants
+    from . import Dates
 
 def basic_check(func):
     def dec(obj, value, unuse, output):
@@ -71,15 +72,14 @@ class Url(object):
 
 class IsoDate(object):
     def __init__(self, *args):
-        pass
+        # LIVR 2.5: an options object with the bounds "min" and "max". LIVR 2.0 ignored the
+        # arguments, so {"iso_date": null} stays the plain iso_date
+        if len(args) == 2 and args[1] is None:
+            args = args[:1]
+        self._min, self._max = Dates.date_bounds('iso_date', args)
 
     @basic_check
     def __call__(self, value, params, unuse):
-        value = constants.TO_STRING(value)
-        # strptime() also accepts one-digit months and days ("2024-1-1")
-        if not re.match(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}\Z', value):
+        if not isinstance(value, constants.STRING_TYPES) or Dates.parse_date(value) is None:
             return 'WRONG_DATE'
-        try:
-            datetime.datetime.strptime(value, '%Y-%m-%d')
-        except ValueError:
-            return 'WRONG_DATE'
+        return Dates.check_date_bounds(value, self._min, self._max)

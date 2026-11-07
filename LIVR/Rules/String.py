@@ -4,8 +4,10 @@ import re
 
 try:
     import constants
+    import Helper
 except ImportError:
     from . import constants
+    from . import Helper
 
 def base_string_check(func):
     def dec(obj, value, unuse, output):
@@ -177,3 +179,77 @@ class String(object):
     def __call__(self, value, unuse, output):
         output.append(value)
 
+
+def string_rule(func):
+    # LIVR 2.5 string rules: empty values pass, the check gets the string form
+    def dec(obj, value, unuse, output):
+        if Helper.is_empty(value):
+            return
+        if not Helper.is_primitive(value):
+            return 'FORMAT_ERROR'
+        return func(obj, Helper.string_form(value), output)
+    return dec
+
+class NotOneOf(object):
+    def __init__(self, *args):
+        if len(args) < 2:
+            Helper.schema_error('not_one_of', 'one or more values are required')
+        for val in args[1:]:
+            if not Helper.is_primitive(val):
+                Helper.schema_error('not_one_of', 'values must be primitive values')
+        self._forbidden = set(Helper.string_form(val) for val in args[1:])
+
+    def __call__(self, value, unuse, output):
+        if Helper.is_empty(value):
+            return
+        if not Helper.is_primitive(value):
+            return 'FORMAT_ERROR'
+        if Helper.string_form(value) in self._forbidden:
+            return 'NOT_ALLOWED_VALUE'
+
+class Digits(object):
+    def __init__(self, *args):
+        Helper.no_arguments('digits', args)
+
+    @string_rule
+    def __call__(self, value, output):
+        if not re.match(r'[0-9]+\Z', value):
+            return 'NOT_DIGITS'
+        output.append(value)
+
+class Affix(object):
+    # starts_with, ends_with and contains: one or more non-empty strings
+    _rule_name = None
+
+    def __init__(self, *args):
+        if len(args) < 2:
+            Helper.schema_error(self._rule_name, 'one or more strings are required')
+        self._affixes = [Helper.string_argument(self._rule_name, arg) for arg in args[1:]]
+        if '' in self._affixes:
+            Helper.schema_error(self._rule_name, 'strings must not be empty')
+
+    @string_rule
+    def __call__(self, value, output):
+        for affix in self._affixes:
+            if self._matches(value, affix):
+                output.append(value)
+                return
+        return 'WRONG_FORMAT'
+
+class StartsWith(Affix):
+    _rule_name = 'starts_with'
+
+    def _matches(self, value, affix):
+        return value.startswith(affix)
+
+class EndsWith(Affix):
+    _rule_name = 'ends_with'
+
+    def _matches(self, value, affix):
+        return value.endswith(affix)
+
+class Contains(Affix):
+    _rule_name = 'contains'
+
+    def _matches(self, value, affix):
+        return affix in value

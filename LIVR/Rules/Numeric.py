@@ -1,10 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
+import math
 try:
     import constants
+    import Helper
 except ImportError:
     from . import constants
+    from . import Helper
 
 def basic_integer_check(func):
     def dec(obj, value, unuse, output):
@@ -111,3 +114,35 @@ class BetweenNumbers(object):
         except:
             return "NOT_NUMBER"
         output.append(formatize_numeric_value(number))
+
+class MaxDecimals(object):
+    def __init__(self, *args):
+        if len(args) < 2:
+            Helper.schema_error('max_decimals', 'a non-negative integer is required')
+        self._max_decimals = Helper.non_negative_integer_argument('max_decimals', args[1])
+
+    def __call__(self, value, unuse, output):
+        if Helper.is_empty(value):
+            return
+        if not Helper.is_primitive(value):
+            return 'FORMAT_ERROR'
+        if isinstance(value, bool):
+            return 'NOT_NUMBER'
+        if isinstance(value, constants.STRING_TYPES):
+            if not re.match(r'-?[0-9]+(?:\.[0-9]+)?\Z', value):
+                return 'NOT_NUMBER'
+            text = value
+        else:
+            text = Helper.string_form(value)
+        # The output is a number, so it must be a finite double
+        try:
+            if math.isinf(float(value)):
+                return 'NOT_NUMBER'
+        except OverflowError:
+            return 'NOT_NUMBER'
+
+        # Trailing zeros after the decimal point do not count
+        fraction = text.partition('.')[2].rstrip('0')
+        if len(fraction) > self._max_decimals:
+            return 'TOO_MANY_DECIMALS'
+        output.append(formatize_numeric_value(value))

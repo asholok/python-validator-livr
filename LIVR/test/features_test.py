@@ -6,6 +6,8 @@ import unittest
 PATH_TO_VALIDATOR = '/'.join(str(os.path.abspath(__file__)).split('/')[:-2])
 sys.path.insert(0,PATH_TO_VALIDATOR)
 import Validator
+import Dates
+import Helper
 
 
 class TestAutoTrim(unittest.TestCase):
@@ -214,7 +216,34 @@ class TestExtraArguments(unittest.TestCase):
         self.assertEqual(validator.validate({'code': 'ABC'}), {'code': 'ABC'})
 
 
-class TestComparison(unittest.TestCase):
+# LIVR 2.5
+class TestArguments(unittest.TestCase):
+    def assertSchemaError(self, rules):
+        self.assertRaises(Exception, Validator.Validator(rules).prepare)
+
+    def test_rule_list_inside_rule_list(self):
+        self.assertSchemaError({'field': {'when': ['x', 'any', ['required', []]]}})
+        self.assertSchemaError({'field': {'when': ['x', {'a': ['required', []]}]}})
+        self.assertSchemaError({'field': {'values': ['required', []]}})
+        self.assertSchemaError({'field': {'keys': [['string', []]]}})
+
+    def test_number_strings(self):
+        # A string in the grammar of "decimal" is the same number
+        validator = Validator.Validator({'mac': {'mac': '64.0'}, 'amount': {'max_decimals': '02'}})
+
+        self.assertEqual(validator.validate({'mac': '70-B3-D5-7E-D0-00-12-34', 'amount': '1.25'}),
+                         {'mac': '70-B3-D5-7E-D0-00-12-34', 'amount': 1.25})
+        self.assertSchemaError({'mac': {'mac': '0x40'}})
+        self.assertSchemaError({'amount': {'max_decimals': ' 2'}})
+        self.assertSchemaError({'amount': {'max_decimals': '1e1'}})
+
+
+class TestStringForm(unittest.TestCase):
+    def test_numbers(self):
+        for number, string in [(1.0, '1'), (-0.0, '0'), (100, '100'), (1e3, '1000'), (0.1, '0.1'),
+                               (-12.25, '-12.25'), (123456789012345, '123456789012345'), (1e-05, '0.00001')]:
+            self.assertEqual(Helper.string_form(number), string)
+
     def test_booleans(self):
         validator = Validator.Validator({'a': {'eq': True}, 'b': {'one_of': [True, False]}, 'c': 'string'})
 
@@ -238,6 +267,135 @@ class TestContainingObject(unittest.TestCase):
 
         self.assertFalse(validator.validate({'codes': ['a']}))
         self.assertEqual(validator.get_errors(), {'codes': ['FIELDS_NOT_EQUAL']})
+
+    def test_auto_trim(self):
+        # References see trimmed values, keys are not trimmed
+        validator = Validator.Validator({
+            'type': 'string',
+            'vat': {'required_if': {'type': 'company'}},
+            'names': {'keys': {'one_of': ['en', 'uk']}}
+        }, True)
+
+        self.assertFalse(validator.validate({'type': ' company ', 'names': {' en': 'x'}}))
+        self.assertEqual(validator.get_errors(), {'vat': 'REQUIRED', 'names': {' en': 'WRONG_KEY'}})
+
+
+class TestClock(unittest.TestCase):
+    def test_utc_date(self):
+        validator = Validator.Validator({
+            'date': {'iso_date': {'max': 'today'}},
+            'datetime': {'iso_datetime': {'min': 'tomorrow'}}
+        })
+        utc_now = Dates.utc_now
+        # 2026-10-18T23:30:00Z, the next day in UTC+1 already
+        Dates.utc_now = lambda: 1792366200
+        try:
+            output = validator.validate({'date': '2026-10-19', 'datetime': '2026-10-19T00:00+00:00'})
+            errors = validator.get_errors()
+        finally:
+            Dates.utc_now = utc_now
+
+        self.assertFalse(output)
+        self.assertEqual(errors, {'date': 'DATE_TOO_LATE'})
+
+
+class TestBooleanCompatibility(unittest.TestCase):
+    # LIVR 2.0 compared booleans in the form "True" and "False": that form keeps matching
+    def assertValid(self, rules, data, output):
+        validator = Validator.Validator(rules)
+        self.assertEqual(validator.validate(data), output, validator.get_errors())
+
+    def assertErrors(self, rules, data, errors):
+        validator = Validator.Validator(rules)
+        self.assertFalse(validator.validate(data))
+        self.assertEqual(validator.get_errors(), errors)
+
+    def test_eq(self):
+        for value in [True, 'true', 'True']:
+            self.assertValid({'a': {'eq': True}}, {'a': value}, {'a': True})
+        for value in [False, 'false', 'False']:
+            self.assertValid({'a': {'eq': False}}, {'a': value}, {'a': False})
+        # A boolean value and a string rule
+        self.assertValid({'a': {'eq': 'True'}, 'b': {'eq': 'false'}}, {'a': True, 'b': False}, {'a': 'True', 'b': 'false'})
+
+        self.assertErrors({'a': {'eq': True}, 'b': {'eq': True}, 'c': {'eq': True}, 'd': {'eq': 'True'}},
+                          {'a': 'TRUE', 'b': 1, 'c': False, 'd': 'true'},
+                          {'a': 'NOT_ALLOWED_VALUE', 'b': 'NOT_ALLOWED_VALUE', 'c': 'NOT_ALLOWED_VALUE', 'd': 'NOT_ALLOWED_VALUE'})
+
+    def test_one_of(self):
+        for value in [True, 'true', 'True']:
+            self.assertValid({'a': {'one_of': [True, False]}}, {'a': value}, {'a': True})
+        for value in [False, 'false', 'False']:
+            self.assertValid({'a': {'one_of': [[True, False]]}}, {'a': value}, {'a': False})
+        self.assertValid({'a': {'one_of': ['x', 'True']}, 'b': {'one_of': ['false', 'y']}}, {'a': True, 'b': False}, {'a': 'True', 'b': 'false'})
+        # The first allowed value that matches, as in 2.0
+        self.assertValid({'a': {'one_of': ['True', True]}}, {'a': True}, {'a': 'True'})
+
+        self.assertErrors({'a': {'one_of': [True]}, 'b': {'one_of': ['True']}, 'c': {'one_of': [1, 0]}},
+                          {'a': 'FALSE', 'b': 'true', 'c': True},
+                          {'a': 'NOT_ALLOWED_VALUE', 'b': 'NOT_ALLOWED_VALUE', 'c': 'NOT_ALLOWED_VALUE'})
+
+    def test_equal_to_field(self):
+        rules = {'a': 'any', 'b': {'equal_to_field': 'a'}}
+        for a, b in [(True, 'True'), ('True', True), (True, 'true'), ('false', False), (True, True)]:
+            self.assertValid(rules, {'a': a, 'b': b}, {'a': a, 'b': b})
+        self.assertErrors(rules, {'a': True, 'b': 'TRUE'}, {'b': 'FIELDS_NOT_EQUAL'})
+
+    def test_selector(self):
+        for key in ['True', 'true']:
+            rules = {'data': {'variable_object': ['flag', {key: {'flag': 'required', 'x': 'integer'}}]}}
+            self.assertValid(rules, {'data': {'flag': True, 'x': '1'}}, {'data': {'flag': True, 'x': 1}})
+
+
+class Arguments(object):
+    def __init__(self, *args):
+        self.args = args[1:]
+        Arguments.last = self
+
+    def __call__(self, value, unuse, unuse_):
+        pass
+
+
+class TestNullArguments(unittest.TestCase):
+    def test_null_is_one_argument(self):
+        # The new rules take no null argument
+        for rules in [{'boolean': None}, {'uuid': None}, {'ip': None}, {'mac': None}, {'hostname': None},
+                      {'unique': None}, {'iso_datetime': None}, {'list_length': None}, {'split': None},
+                      {'base64': None}, {'digest': None}, {'max_decimals': None}]:
+            self.assertRaises(Exception, Validator.Validator({'field': rules}).prepare)
+
+    def test_iso_date_ignores_null(self):
+        # LIVR 2.0 ignored the arguments of iso_date
+        validator = Validator.Validator({'date': {'iso_date': None}})
+
+        self.assertEqual(validator.validate({'date': '2026-11-07'}), {'date': '2026-11-07'})
+        self.assertFalse(validator.validate({'date': '2026-02-30'}))
+        self.assertEqual(validator.get_errors(), {'date': 'WRONG_DATE'})
+
+    def test_null_inside_arguments(self):
+        for rules in [{'not_one_of': [None]}, {'required_if': {'type': None}}, {'list_length': {'min': None}},
+                      {'list_length': {'max': None}}]:
+            self.assertRaises(Exception, Validator.Validator({'field': rules}).prepare)
+
+    def test_default_null(self):
+        # The rules of LIVR 2.0 get null as an argument, as before
+        validator = Validator.Validator({'a': {'default': None}, 'b': {'default': None}})
+
+        self.assertEqual(validator.validate({'b': ''}), {'a': None, 'b': None})
+
+    def test_custom_rules_get_null(self):
+        validator = Validator.Validator({'field': {'custom': None}})
+        validator.register_rules({'custom': Arguments})
+        validator.prepare()
+        self.assertEqual(Arguments.last.args, (None,))
+
+
+class TestUnique(unittest.TestCase):
+    def test_key_value_is_object_next_to_empty_key(self):
+        validator = Validator.Validator({'a': {'unique': ['x', 'y']}, 'b': {'unique': ['x', 'y']}})
+
+        self.assertFalse(validator.validate({'a': [{'x': '', 'y': {'z': 1}}], 'b': [{'y': ['z']}]}))
+        self.assertEqual(validator.get_errors(), {'a': 'FORMAT_ERROR', 'b': 'FORMAT_ERROR'})
 
 
 if __name__ == '__main__':

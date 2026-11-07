@@ -1,8 +1,10 @@
 import re
 try:
     import constants
+    import Helper
 except ImportError:
     from . import constants
+    from . import Helper
 
 ESCAPE_RE = lambda string: re.escape(string)
 
@@ -67,3 +69,18 @@ class LeaveOnly(object):
             return
 
         output.append(re.sub('[^' + self._chars + ']', '', value))
+
+
+class Split(object):
+    def __init__(self, *args):
+        if len(args) < 2:
+            Helper.schema_error('split', 'a separator is required')
+        self._separator = Helper.string_argument('split', args[1])
+        if self._separator == '':
+            Helper.schema_error('split', 'the separator must not be empty')
+
+    def __call__(self, value, unuse, output):
+        # Lists, objects and empty values stay as they are
+        if Helper.is_empty(value) or not Helper.is_primitive(value):
+            return
+        output.append(Helper.string_form(value).split(self._separator))
