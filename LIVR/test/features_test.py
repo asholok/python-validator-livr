@@ -214,5 +214,31 @@ class TestExtraArguments(unittest.TestCase):
         self.assertEqual(validator.validate({'code': 'ABC'}), {'code': 'ABC'})
 
 
+class TestComparison(unittest.TestCase):
+    def test_booleans(self):
+        validator = Validator.Validator({'a': {'eq': True}, 'b': {'one_of': [True, False]}, 'c': 'string'})
+
+        self.assertEqual(validator.validate({'a': 'true', 'b': 'false', 'c': True}), {'a': True, 'b': False, 'c': 'true'})
+
+
+class TestContainingObject(unittest.TestCase):
+    def test_alias_and_or_see_siblings(self):
+        validator = Validator.Validator({
+            'password': 'required',
+            'password2': 'same_password',
+            'password3': {'or': [{'equal_to_field': 'password'}, 'integer']}
+        })
+        validator.register_aliased_rule({'name': 'same_password', 'rules': {'equal_to_field': 'password'}})
+
+        self.assertEqual(validator.validate({'password': 'secret', 'password2': 'secret', 'password3': 'secret'}),
+                         {'password': 'secret', 'password2': 'secret', 'password3': 'secret'})
+
+    def test_list_items_see_no_fields(self):
+        validator = Validator.Validator({'codes': {'list_of': {'equal_to_field': 'codes'}}})
+
+        self.assertFalse(validator.validate({'codes': ['a']}))
+        self.assertEqual(validator.get_errors(), {'codes': ['FIELDS_NOT_EQUAL']})
+
+
 if __name__ == '__main__':
     unittest.main()

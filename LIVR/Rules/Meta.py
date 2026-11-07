@@ -16,7 +16,9 @@ def get_selected_validator(validators, obj, selector_field):
     selector = obj.get(selector_field)
     if constants.EMPTY_PRIMITIVE(selector) or not isinstance(selector, constants.PRIMITIVE_LIST):
         return
-    return validators.get(constants.TO_STRING(selector))
+    for form in constants.COMPARISON_FORMS(selector):
+        if form in validators:
+            return validators[form]
 
 class NestedObject(object):
     def __init__(self, *args):
@@ -63,14 +65,16 @@ class ListOf(object):
         error_flag = False
 
         for val in values:
-            result = self._validator.validate({'field': val})
-            
-            if result:
-                results.append(result['field'])
-                errors.append(None)
-            else:
+            # Items have no containing object: a reference in their rules is a missing value
+            result = []
+            error_code = self._validator.validate_field('field', val, {}, result)
+
+            if error_code:
                 error_flag = True
-                errors.append(self._validator.get_errors()['field'])
+                errors.append(error_code)
+            else:
+                results.append(result[0] if result else val)
+                errors.append(None)
 
         if error_flag:
             return errors
@@ -177,21 +181,16 @@ class Or(object):
             validator.prepare()
             self._validators.append(validator)
 
-    def __call__(self, value, unuse, output):
+    def __call__(self, value, all_values, output):
         last_error = None
 
-        # A missing value stays missing: the rules get no field
-        data = {} if value is None else {'field': value}
-
+        # The rule sets are transparent: their rules see the siblings of the field
         for validator in self._validators:
-            result = validator.validate(data)
+            error_code = validator.validate_field('field', value, all_values, output)
 
-            if result is not False:
-                if 'field' in result:
-                    output.append(result['field'])
+            if not error_code:
                 return
-            else:
-                last_error = validator.get_errors()['field']
+            last_error = error_code
 
         if last_error:
             return last_error

@@ -43,7 +43,8 @@ class EqualToField(object):
         # Values are compared as strings, a missing field is not equal to any value
         if not isinstance(other, constants.PRIMITIVE_LIST):
             return 'FIELDS_NOT_EQUAL'
-        if constants.TO_STRING(value) != constants.TO_STRING(other):
+        if constants.TO_STRING(value) != constants.TO_STRING(other) \
+                and constants.TO_STRING_2_0(value) != constants.TO_STRING_2_0(other):
             return 'FIELDS_NOT_EQUAL'
 
 

@@ -19,18 +19,44 @@ def base_string_check(func):
     return dec
 
 
+def comparison_check(func):
+    # Like base_string_check, but the value keeps its type: a boolean has two comparison forms
+    def dec(obj, value, unuse, output):
+        if constants.EMPTY_PRIMITIVE(value):
+            return
+        if not isinstance(value, constants.PRIMITIVE_LIST):
+            return 'FORMAT_ERROR'
+        return func(obj, value, unuse, output)
+    return dec
+
+
 class OneOf(object):
     def __init__(self, *args):
         self._allowed_list = args[1]
         
         if not isinstance(self._allowed_list, list):
             self._allowed_list = args[1:]
+
+        # Built on the first validation, so building a validator stays cheap
+        self._allowed = None
+
+    def _build_allowed(self):
+        # The allowed value of each comparison form, the first one wins
+        allowed = {}
+        for val in reversed(self._allowed_list):
+            allowed[constants.TO_STRING(val)] = val
+            if isinstance(val, bool):
+                allowed[constants.TO_STRING_2_0(val)] = val
+        return allowed
     
-    @base_string_check
+    @comparison_check
     def __call__(self, value, unuse, output):
-        for val in self._allowed_list:
-            if constants.TO_STRING(value) == constants.TO_STRING(val):
-                output.append(val)
+        allowed = self._allowed
+        if allowed is None:
+            allowed = self._allowed = self._build_allowed()
+        for form in constants.COMPARISON_FORMS(value):
+            if form in allowed:
+                output.append(allowed[form])
                 return
         return 'NOT_ALLOWED_VALUE'
 
@@ -133,12 +159,14 @@ class Like(object):
 class Eq(object):
     def __init__(self, *args):
         self._allowed_value = args[1]
+        self._allowed_forms = constants.COMPARISON_FORMS(self._allowed_value)
 
-    @base_string_check
+    @comparison_check
     def __call__(self, value, unuse, output):
-        if constants.TO_STRING(self._allowed_value) == constants.TO_STRING(value):
-            output.append(self._allowed_value)
-            return
+        for form in constants.COMPARISON_FORMS(value):
+            if form in self._allowed_forms:
+                output.append(self._allowed_value)
+                return
         return 'NOT_ALLOWED_VALUE'
 
 class String(object):
