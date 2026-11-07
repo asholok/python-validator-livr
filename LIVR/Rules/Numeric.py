@@ -54,7 +54,7 @@ class Decimal(object):
 
     @basic_integer_check
     def __call__(self, value, unuse, output):
-        if not re.match(r"^(?:\-?(?:[0-9]+\.[0-9]+)|(?:[0-9]+))\Z", constants.TO_STRING(value)):
+        if not re.match(r"^-?(?:[0-9]+\.[0-9]+|[0-9]+)\Z", constants.TO_STRING(value)):
             return 'NOT_DECIMAL'
         output.append(formatize_numeric_value(value))
 

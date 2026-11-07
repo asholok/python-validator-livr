@@ -164,5 +164,55 @@ class TestPython2(unittest.TestCase):
         self.assertEqual(validator.validate({'text': 0.1 + 0.2}), {'text': '0.30000000000000004'})
 
 
+class TestDecimal(unittest.TestCase):
+    def test_negative_integer(self):
+        validator = Validator.Validator({'string': 'decimal', 'number': 'decimal'})
+
+        self.assertEqual(validator.validate({'string': '-200', 'number': -200}), {'string': -200, 'number': -200})
+
+
+class Upper(object):
+    def __init__(self, *args):
+        pass
+
+    def __call__(self, value, unuse, output):
+        if value != value.upper():
+            return 'NOT_UPPER'
+
+
+class TestExtraArguments(unittest.TestCase):
+    def test_meta_rules_keep_custom_rules(self):
+        # Extra arguments are ignored, the rules of the validator stay with the meta rules
+        validator = Validator.Validator({
+            'object': {'nested_object': [{'code': 'upper'}, 'extra']},
+            'list': {'list_of': [['upper'], 'extra']},
+            'objects': {'list_of_objects': [{'code': 'upper'}, 'extra']},
+            'variable': {'variable_object': ['type', {'a': {'code': 'upper'}}, 'extra']},
+            'different': {'list_of_different_objects': ['type', {'a': {'code': 'upper'}}, 'extra']}
+        })
+        validator.register_rules({'upper': Upper})
+        output = validator.validate({
+            'object': {'code': 'x'},
+            'list': ['x'],
+            'objects': [{'code': 'x'}],
+            'variable': {'type': 'a', 'code': 'x'},
+            'different': [{'type': 'a', 'code': 'x'}]
+        })
+
+        self.assertFalse(output)
+        self.assertEqual(validator.get_errors(), {
+            'object': {'code': 'NOT_UPPER'},
+            'list': ['NOT_UPPER'],
+            'objects': [{'code': 'NOT_UPPER'}],
+            'variable': {'code': 'NOT_UPPER'},
+            'different': [{'code': 'NOT_UPPER'}]
+        })
+
+    def test_like_keeps_flag(self):
+        validator = Validator.Validator({'code': {'like': ['^[a-z]+$', 'i', 'extra']}})
+
+        self.assertEqual(validator.validate({'code': 'ABC'}), {'code': 'ABC'})
+
+
 if __name__ == '__main__':
     unittest.main()
