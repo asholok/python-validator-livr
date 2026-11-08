@@ -50,12 +50,14 @@ class EqualToField(object):
 
 
 class Url(object):
+    # LIVR 2.5: no dot after the host, labels of 1-63 characters (the top-level domain too),
+    # ports of 1-5 ASCII digits up to 65535. Labels cannot contain ".", so they do not overlap
     _url_re = re.compile(
         r'^(?:http|https)s?://'
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,63})|'
         r'localhost|'
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
-        r'(?::\d+)?'
+        r'(?::(?:[0-9]{1,4}|[0-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?'
         r'(?:/?|[/?]\S+)\Z', re.I)
     
     def __init__(self, *args):

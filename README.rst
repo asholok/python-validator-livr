@@ -127,6 +127,8 @@ digest, mongo_id, hex_color, mac, e164, semver, jwt, luhn, credit_card, iban. is
  * Booleans are "true" and "false" in string rules, so ``{'eq': True}`` accepts ``True`` and ``"true"``.
    ``eq``, ``one_of``, ``equal_to_field`` and the selectors of ``variable_object`` keep matching the form of 2.0,
    ``"True"`` and ``"False"``, too.
+ * ``url`` rejects a dot after the host (``https://example.com.``, ``https://example.com./path``), host labels and
+   top-level domains longer than 63 characters and ports above 65535. A dot in the path or the query is fine.
  * ``{'rule': None}`` is one ``None`` argument. The new rules take no ``None``, so ``{'boolean': None}`` raises
    an exception; the rules of LIVR 2.0 and custom rules get ``None`` as before. ``{'iso_date': None}`` stays
    ``'iso_date'``, as LIVR 2.0 ignored the arguments of ``iso_date``.
