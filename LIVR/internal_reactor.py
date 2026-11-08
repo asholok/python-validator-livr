@@ -1,4 +1,23 @@
 
+try:
+    STRING_TYPES = (str, unicode)
+except NameError:
+    STRING_TYPES = (str,)
+
+
+def apply_rules(validators, value, all_values, output):
+    # The output of a rule is the input of the next one
+    mid_result = []
+
+    for func in validators:
+        error_code = func(mid_result[-1] if mid_result else value, all_values, mid_result)
+        if error_code:
+            return error_code
+
+    if mid_result:
+        output.append(mid_result[-1])
+
+
 class InternalValidator(object):
     def __init__(self, livr_rules, is_auto_trim = False):
         self._is_prepare = False
@@ -29,28 +48,23 @@ class InternalValidator(object):
         if not self._is_prepare:
             self.prepare()
         if self._is_auto_trim:
-            self._auto_trim(data)
+            data = self._auto_trim(data)
         if not isinstance(data, dict):
-            self._error = "FORMAT_ERROR"
-            return
+            self._errors = "FORMAT_ERROR"
+            return False
 
         for field_name, validators in self._validators.items():
             if not validators:
                 continue
-            mid_result = []
-            value = data[field_name] if field_name in data else None
-            
-            for func in validators:
-                arg = result[field_name] if field_name in result else value
-                error_code = func(arg, data, mid_result)
+            output = []
+            error_code = apply_rules(validators, data.get(field_name), data, output)
 
-                if error_code:
-                    errors[field_name] = error_code
-                    break
-                elif len(mid_result):
-                    result[field_name] = mid_result[-1] 
-                elif field_name in data and not field_name in result:
-                    result[field_name] = value
+            if error_code:
+                errors[field_name] = error_code
+            elif output:
+                result[field_name] = output[0]
+            elif field_name in data:
+                result[field_name] = data[field_name]
 
         if not errors:
             self._errors = None
@@ -59,6 +73,14 @@ class InternalValidator(object):
             self._errors = errors
             return False
 
+    def validate_field(self, field_name, value, all_values, output):
+        """Validates value with the rules of field_name. The rules see the fields of all_values,
+        the containing object (LIVR 2.5, 2.5). Returns the error; the output goes to output,
+        nothing when the value stays as it is"""
+        if not self._is_prepare:
+            self.prepare()
+        return apply_rules(self._validators[field_name], value, all_values, output)
+
     def get_errors(self):
         return self._errors
 
@@ -66,8 +88,7 @@ class InternalValidator(object):
         return self._validator_builders
 
     def register_rules(self, rules):
-        for rule_name, rule_value in rules.items():
-            self._validator_builders[rule_name] = rule_value
+        self._validator_builders.update(rules)
 
     def _parse_rule(self,  livr_rule):
         if isinstance(livr_rule, dict):
@@ -87,7 +108,7 @@ class InternalValidator(object):
         return self._validator_builders[name](self._validator_builders, *args)
 
     def _auto_trim(self, data):
-        if type(data) is str:
+        if isinstance(data, STRING_TYPES):
             return data.strip()
         
         elif type(data) is list:

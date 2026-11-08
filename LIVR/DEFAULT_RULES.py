@@ -9,6 +9,10 @@ import Special
 import String
 import Numeric
 import Meta
+import Dates
+import Lists
+import Format
+import Checksum
 
 
 DEFAULT_RULES = {
@@ -54,5 +58,47 @@ DEFAULT_RULES = {
     'remove':           Modifiers.Remove,
     'leave_only':       Modifiers.LeaveOnly,
 
+    # LIVR 2.5
+    'boolean':          Common.Boolean,
+    'any':              Common.Any,
+    'required_if':      Common.RequiredIf,
+
+    'not_one_of':       String.NotOneOf,
+    'digits':           String.Digits,
+    'starts_with':      String.StartsWith,
+    'ends_with':        String.EndsWith,
+    'contains':         String.Contains,
+
+    'max_decimals':     Numeric.MaxDecimals,
+
+    'iso_datetime':     Dates.IsoDatetime,
+    'iso_time':         Dates.IsoTime,
+
+    'when':             Meta.When,
+    'values':           Meta.Values,
+    'keys':             Meta.Keys,
+
+    'list_length':      Lists.ListLength,
+    'unique':           Lists.Unique,
+
+    'split':            Modifiers.Split,
+
+    'uuid':             Format.Uuid,
+    'ip':               Format.Ip,
+    'cidr':             Format.Cidr,
+    'hostname':         Format.Hostname,
+    'base64':           Format.Base64,
+    'hex':              Format.Hex,
+    'digest':           Format.Digest,
+    'mongo_id':         Format.MongoId,
+    'hex_color':        Format.HexColor,
+    'mac':              Format.Mac,
+    'e164':             Format.E164,
+    'semver':           Format.Semver,
+    'jwt':              Format.Jwt,
+
+    'luhn':             Checksum.Luhn,
+    'credit_card':      Checksum.CreditCard,
+    'iban':             Checksum.Iban,
 }
 

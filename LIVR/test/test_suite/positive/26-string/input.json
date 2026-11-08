@@ -1,8 +1,9 @@
 {
-    "city1": "Moscow",
-    "city2": "Kiev",
+    "city1": "Lviv",
+    "city2": "Kyiv",
     "number1": "2",
     "number2": 2,
     "empty_city": "",
-    "extra_city": "New York"
+    "extra_city": "New York",
+    "null_value": null
 }

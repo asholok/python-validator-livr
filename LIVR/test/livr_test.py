@@ -1,6 +1,7 @@
+import io
 import os
+import json
 import unittest
-import yaml
 
 class TestSuite(unittest.TestCase):
     def runTest(self, path, core):
@@ -16,8 +17,10 @@ class TestSuite(unittest.TestCase):
         data = {}
 
         for path in files_path:
+            if not path.endswith('.json'):
+                continue
             name_in_dict = ''.join(path.split('/')[-1]).replace('.json', '')
-            with open(path) as f:
-                data[name_in_dict] = yaml.load(f)
+            with io.open(path, encoding='utf-8') as f:
+                data[name_in_dict] = json.load(f)
         
         return data

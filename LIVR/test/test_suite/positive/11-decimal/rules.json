@@ -2,6 +2,10 @@
     "number1": "decimal",
     "number2": ["decimal"],
     "number3": [ { "decimal": [] } ],
-    "number4": "decimal",
-    "empty_field": "decimal"
+    "number4": "decimal",    
+    "empty_field": "decimal",
+    "negative_integer_string": "decimal",
+    "negative_integer": "decimal",
+    "zero": "decimal",
+    "null_value": "decimal"
 }
